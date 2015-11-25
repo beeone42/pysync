@@ -1,0 +1,16 @@
+{
+	"server_url":"http:\/\/pysync.domain.com\/tracker.py",
+	"server_password":"http:\/\/pysync.domain.com\/tracker.py",
+	"folders":{
+		"CDN":{
+			"path":"\/space\/cdn\/",
+			"master_secret":"",
+			"slave_secret":"qwerty9876543210"
+		},
+		"pictures":{
+			"path":"\/home\/John\/Pictures\/",
+			"master_secret":"eb0a191797624dd3a48fa681d3061212",
+			"slave_secret":"03158cf39c6f316f9ce98a4e034cdc28"
+		}
+	}
+}
