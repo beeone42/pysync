@@ -1,6 +1,21 @@
 #!/usr/bin/env python
 
-import os, json, sys, glob, hashlib, time
+"""
+TODO
+
+foreach (config.paths as p)
+
+list_master = dl list from server(p.slave_key)
+list_local = create local list
+if config_master_key != "":
+	upload(dff(list_master, list_local), p.master_key, p.slave_key)
+else
+	download(dff(list_local, list_master), p.slave_key)
+
+
+import os, json, sys, glob, hashlib, time, datetime
+"""
+
 
 CONFIG_FILE = 'config.json.sample'
 
@@ -44,3 +59,19 @@ def md5(file_name):
         for chunk in iter(lambda: f.read(4096), b""):
             hash.update(chunk)
     return hash.hexdigest()
+
+"""
+Make a diff between master and client list
+"""
+
+def diff_list(master_list, client_list):
+	print master_list
+	print "-------------"
+	print client_list
+
+"""
+log function
+"""
+
+def ilog(log_msg):
+	print str(datetime.datetime.now()) + " - " + log_msg.strip()
