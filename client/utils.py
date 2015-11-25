@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, json, sys, glob, hashlib
+import os, json, sys, glob, hashlib, time
 
 CONFIG_FILE = 'config.json.sample'
 
@@ -17,20 +17,22 @@ def open_and_load_config():
 		sys.exit(1)
 
 """
-Scan a repertory and check all the file in it
-If not file_ext is mentionned, * is default
+Scan a directory and get all file's name / size and mtime
+If not mask is not mentionned, * is default
 """
 
-def scan_repertory(path, file_ext):
-	if file_ext == "":
-		file_ext == "*"
+def scan_directory(path, mask):
+	if mask == "":
+		mask = "*"
 	try:
 		os.chdir(path)
-		for file in glob.glob(file_ext):
-			print(file)
-	except:
+		list_of_file = {}
+		for f in glob.glob(mask):
+			statinfo = os.stat(f)
+			list_of_file[f] = str(statinfo.st_size) + "@" + str(statinfo.st_mtime)
+		return list_of_file
+	except Exception as e:
 		print "Path [%s] doesn't exist, aborting." % (path)
-		sys.exit(1)
 
 """
 Md5 checksum a file
