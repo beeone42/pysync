@@ -12,10 +12,8 @@ if config_master_key != "":
 else
 	download(dff(list_local, list_master), p.slave_key)
 
-
-import os, json, sys, glob, hashlib, time, datetime
 """
-
+import os, json, sys, glob, hashlib, time, datetime, json
 
 CONFIG_FILE = 'config.json.sample'
 
@@ -47,6 +45,7 @@ def scan_directory(path, mask):
 			list_of_file[f] = str(statinfo.st_size) + "@" + str(statinfo.st_mtime)
 		return list_of_file
 	except Exception as e:
+		print e
 		print "Path [%s] doesn't exist, aborting." % (path)
 
 """
@@ -64,10 +63,17 @@ def md5(file_name):
 Make a diff between master and client list
 """
 
-def diff_list(master_list, client_list):
-	print master_list
-	print "-------------"
-	print client_list
+def generate_json(dic):
+	response = []
+	files = []
+	key = "this_is_the_key"
+	response.append({'key' : key})
+	for data in dic:
+		files.append({data : [dic[data].split("@")[0], dic[data].split("@")[1]]})
+	response.append({'files' : files})
+	return response
+
+
 
 """
 log function
@@ -75,3 +81,5 @@ log function
 
 def ilog(log_msg):
 	print str(datetime.datetime.now()) + " - " + log_msg.strip()
+
+
