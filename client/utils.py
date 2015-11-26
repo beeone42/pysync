@@ -60,7 +60,7 @@ def md5(file_name):
     return hash.hexdigest()
 
 """
-Make a diff between master and client list
+Make a json with the dic from scan_directory
 """
 
 def generate_json(dic):
