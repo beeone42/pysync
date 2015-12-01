@@ -46,7 +46,7 @@ def scan_directory(path, mask):
 		return list_of_file
 	except Exception as e:
 		print e
-		print "Path [%s] doesn't exist, aborting." % (path)
+		print "Path [%s] doesn't exist or mask [%s] isn't valid, aborting." % (path, mask)
 
 """
 Md5 checksum a file
