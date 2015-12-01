@@ -1,4 +1,27 @@
 var querystring = require("querystring");
+var fs = require("fs");
+
+function walk(path)
+{
+    console.log("walk " + path);
+    var res = [];
+    var tmp = fs.readdirSync(path);
+    tmp.forEach(function (file) {
+	console.log("file: [" + file + "]");
+	stats = fs.statSync(path + "/" + file);
+	console.log(stats);
+	var f = {};
+	f['name'] = path + "/" + file;
+	f['size'] = stats['size'];
+	f['mtime'] = stats['mtime'];
+	res.push(f);
+	if (stats.isDirectory())
+	{
+	    res = res.concat(walk(path + "/" + file));
+	}
+    });
+    return (res);
+}
 
 function hello(response, postData) {
     response.writeHead(200, {"Content-Type": "text/plain"});
@@ -7,11 +30,11 @@ function hello(response, postData) {
 }
 
 function get_list(response, postData) {
-    res = new Object();
-    res.files = {};
+    res = walk(".");
     response.writeHead(200, {"Content-Type": "application/json"});
     response.write(JSON.stringify(res));
     response.end();
+
 }
 
 function get_file(response, postData) {
