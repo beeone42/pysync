@@ -1,5 +1,6 @@
 var querystring = require("querystring");
 var fs = require("fs");
+var url = require('url');
 
 function walk(path)
 {
@@ -23,21 +24,20 @@ function walk(path)
     return (res);
 }
 
-function hello(response, postData) {
+function hello(conf, response, qs, postData) {
     response.writeHead(200, {"Content-Type": "text/plain"});
     response.write("Hello");
     response.end();
 }
 
-function get_list(response, postData) {
-    res = walk(".");
-    response.writeHead(200, {"Content-Type": "application/json"});
-    response.write(JSON.stringify(res));
-    response.end();
-
+function get_list(conf, response, qs, postData) {
+    //console.log(url.parse(request.url));
+    //console.log(JSON.stringify(request.querystring));
+    // res = walk("."); response.json(res);
+    conf.db.get_files(conf, response, qs.s_key);
 }
 
-function get_file(response, postData) {
+function get_file(conf, response, qs, postData) {
     response.writeHead(200, {"Content-Type": "text/plain"});
     response.write("url:" + querystring.parse(postData).filename);
     response.end();
