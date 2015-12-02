@@ -74,7 +74,6 @@ def generate_json(dic):
 	return response
 
 
-
 """
 log function
 """
@@ -83,4 +82,10 @@ def ilog(log_msg):
 	print str(datetime.datetime.now()) + " - " + log_msg.strip()
 
 
+"""
+diff the server list and slave list and output what need to be uploaded
+"""
+
+def diff(list_m, list_s):
+	pass
 
