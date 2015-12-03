@@ -63,12 +63,22 @@ function put_list(conf, response, client_id, s_key, files) {
 			conf.connection.escape(key_id) + ", " +
 			conf.connection.escape(client_id) + ", " +
 			conf.connection.escape(files[i].path) + ", " +
-			conf.connection.escape(files[i].size) + ", FROM_UNIXTIME(" +
-			conf.connection.escape(Date.parse(files[i].mtime).toString()) + "), " +
+			conf.connection.escape(files[i].size) + "," +
+			conf.connection.escape(new Date(Date.parse(files[i].mtime)).toLocaleString()) + ", " +
 			conf.connection.escape(files[i].md5) + ") ";
 		}
 		console.log(q2);
-		response.json({});
+		conf.connection.query(q2, function(err, res, fields) {
+		    if (!err)
+		    {
+			response.json({});
+		    }
+		    else
+		    {
+			console.log(err);
+			response.fail(err);
+		    }
+		});
 	    }
 	    else
 	    {
