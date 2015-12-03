@@ -13,6 +13,17 @@ function json(obj)
     this.end();
 }
 
+function fail(err)
+{
+    var res = {};
+
+    res['succes'] = false;
+    res['error'] = err;
+    this.writeHead(200, {"Content-Type": "application/json"});
+    this.write(JSON.stringify(res));
+    this.end();
+}
+
 function text(str)
 {
     this.writeHead(200, {"Content-Type": "plain/text"});
@@ -47,6 +58,8 @@ function start(conf, route, handle) {
 	var pathname = url.parse(request.url).pathname;
 	console.log("Request from " + request.connection.remoteAddress + " for path " + pathname + ".");
 	response.json = json;
+	response.fail = fail;
+	response.text = text;
 	response.error401 = error401;
 	response.error404 = error404;
 	response.error500 = error500;

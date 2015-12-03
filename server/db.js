@@ -51,10 +51,27 @@ function put_list(conf, response, s_key, files) {
 
 function register_client(conf, response, m_key, s_key, baseurl)
 {
-    console.log(m_key);
-    console.log(s_key);
-    console.log(baseurl);
-    response.json({"client_id":"1"});
+    var q = "SELECT clients.id FROM clients " +
+	" LEFT JOIN `keys` ON `keys`.id = `clients`.key_id " + 
+	" WHERE `clients`.baseurl = " + conf.connection.escape(baseurl) + " " +
+	" AND `keys`.s_key = " + conf.connection.escape(s_key) + " ";
+    console.log(q);
+    conf.connection.query(q, function(err, rows, fields) {
+	if (!err)
+	{
+	    console.log('The solution is: ', rows);
+	    if (rows.count > 0)
+		response.json(rows);
+	    else
+		response.fail("");
+	}
+	else
+	{
+	    console.log('Error while performing Query.');
+	    console.log(err);
+	    response.error500();
+	}
+    });
 }
 
 exports.get_list = get_list;
