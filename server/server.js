@@ -13,6 +13,13 @@ function json(obj)
     this.end();
 }
 
+function text(str)
+{
+    this.writeHead(200, {"Content-Type": "plain/text"});
+    this.write(str);
+    this.end();
+}
+
 function error401()
 {
     this.writeHead(401, {"Content-Type": "text/plain"});
@@ -38,7 +45,7 @@ function start(conf, route, handle) {
     function onRequest(request, response) {
 	var postData = "";
 	var pathname = url.parse(request.url).pathname;
-	console.log("Request for path " + pathname + ".");
+	console.log("Request from " + request.connection.remoteAddress + " for path " + pathname + ".");
 	response.json = json;
 	response.error401 = error401;
 	response.error404 = error404;
@@ -49,6 +56,7 @@ function start(conf, route, handle) {
 	    console.log("Paquet POST reçu '"+ postDataChunk + "'.");
 	});
 	request.addListener("end", function() {
+	    //console.log(request);
 	    var qs = querystring.parse(url.parse(request.url).query);
 	    console.log(JSON.stringify(qs));
 	    route(conf, handle, pathname, response, qs, postData);
