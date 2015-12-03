@@ -43,7 +43,7 @@ function get_file(conf, response, qs, postData) {
 
 function put_list(conf, response, qs, postData) {
     console.log(postData);
-    conf.db.put_list(conf, response, qs.s_key, JSON.parse(querystring.parse(postData).data));
+    conf.db.put_list(conf, response, qs.client_id, qs.s_key, JSON.parse(querystring.parse(postData).data));
 }
 
 function register_client(conf, response, qs, postData) {

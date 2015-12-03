@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.7.9)
 # Database: pysync
-# Generation Time: 2015-12-02 13:22:20 +0000
+# Generation Time: 2015-12-03 15:04:39 +0000
 # ************************************************************
 
 
@@ -28,7 +28,7 @@ DROP TABLE IF EXISTS `clients`;
 CREATE TABLE `clients` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `key_id` int(11) DEFAULT NULL,
-  `baseurl` mediumtext,
+  `baseurl` varchar(1024) DEFAULT '',
   `is_master` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

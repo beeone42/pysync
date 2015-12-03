@@ -44,9 +44,42 @@ function get_file(conf, response, s_key, path) {
 
 }
 
-function put_list(conf, response, s_key, files) {
+function put_list(conf, response, client_id, s_key, files) {
     console.log(files);
-    response.error500();
+    var q = "SELECT `keys`.id FROM `keys` WHERE s_key = " + conf.connection.escape(s_key);
+    console.log(q);
+    conf.connection.query(q, function(err, rows, fields) {
+	if (!err)
+	{
+	    if (rows.length >= 0) // key already exist yet
+	    {
+		var key_id = rows[0].id;
+		var q2 = "INSERT INTO `files` (key_id, client_id, path, size, mtime, md5) VALUES ";
+		for (i = 0; i < files.length; i++)
+		{
+		    if (i > 0)
+			q2 = q2 + ", ";
+		    q2 = q2 + "(" +
+			conf.connection.escape(key_id) + ", " +
+			conf.connection.escape(client_id) + ", " +
+			conf.connection.escape(files[i].path) + ", " +
+			conf.connection.escape(files[i].size) + ", FROM_UNIXTIME(" +
+			conf.connection.escape(Date.parse(files[i].mtime).toString()) + "), " +
+			conf.connection.escape(files[i].md5) + ") ";
+		}
+		console.log(q2);
+		response.json({});
+	    }
+	    else
+	    {
+		response.fail("unknown s_key");
+	    }
+	}
+	else
+	{
+	    response.error500();
+	}
+    });
 }
 
 function do_register_client(conf, response, key_id, baseurl, is_master)
