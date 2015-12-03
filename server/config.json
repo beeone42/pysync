@@ -1,8 +1,0 @@
-{
-    "server_password":"ChangeMe",
-    "port":8000,
-    "mysql_host":"localhost",
-    "mysql_user":"pysync",
-    "mysql_pass":"123456",
-    "mysql_db":"pysync"
-}
