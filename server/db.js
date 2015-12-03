@@ -49,6 +49,16 @@ function put_list(conf, response, s_key, files) {
     response.error500();
 }
 
+function register_client(conf, response, m_key, s_key, baseurl)
+{
+    console.log(m_key);
+    console.log(s_key);
+    console.log(baseurl);
+    response.json({"client_id":"1"});
+}
+
 exports.get_list = get_list;
 exports.get_file = get_file;
 exports.put_list = put_list;
+exports.register_client = register_client;
+

@@ -46,7 +46,13 @@ function put_list(conf, response, qs, postData) {
     conf.db.put_list(conf, response, qs.s_key, JSON.parse(querystring.parse(postData).data));
 }
 
+function register_client(conf, response, qs, postData) {
+    console.log(qs);
+    conf.db.register_client(conf, response, qs.m_key, qs.s_key, qs.baseurl);
+}
+
 exports.hello = hello;
 exports.get_list = get_list;
 exports.get_file = get_file;
 exports.put_list = put_list;
+exports.register_client = register_client;

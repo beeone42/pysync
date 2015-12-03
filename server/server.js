@@ -13,6 +13,13 @@ function json(obj)
     this.end();
 }
 
+function text(str)
+{
+    this.writeHead(200, {"Content-Type": "plain/text"});
+    this.write(str);
+    this.end();
+}
+
 function error401()
 {
     this.writeHead(401, {"Content-Type": "text/plain"});
