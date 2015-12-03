@@ -49,21 +49,28 @@ function put_list(conf, response, s_key, files) {
     response.error500();
 }
 
-function register_client(conf, response, m_key, s_key, baseurl)
+function do_register_client(conf, response, key_id, baseurl, is_master)
 {
     var q = "SELECT clients.id FROM clients " +
-	" LEFT JOIN `keys` ON `keys`.id = `clients`.key_id " + 
 	" WHERE `clients`.baseurl = " + conf.connection.escape(baseurl) + " " +
-	" AND `keys`.s_key = " + conf.connection.escape(s_key) + " ";
+	" AND `clients`.key_id = " + conf.connection.escape(key_id) + " ";
     console.log(q);
     conf.connection.query(q, function(err, rows, fields) {
 	if (!err)
 	{
 	    console.log('The solution is: ', rows);
-	    if (rows.count > 0)
-		response.json(rows);
-	    else
-		response.fail("");
+	    if (rows.length > 0)
+		response.json({"client_id":rows[0].id});
+	    else // new client
+	    {
+		var q2 = "INSERT INTO clients (key_id, baseurl, is_master) VALUES (" +
+		    conf.connection.escape(key_id) + ", " +
+		    conf.connection.escape(baseurl) + ", " +
+		    conf.connection.escape(is_master) +
+		    ")";
+		console.log(q2);
+		response.json({"client_id":"42"});
+	    }
 	}
 	else
 	{
@@ -73,6 +80,57 @@ function register_client(conf, response, m_key, s_key, baseurl)
 	}
     });
 }
+
+function register_client(conf, response, m_key, s_key, baseurl)
+{
+
+    var q = "SELECT `keys`.id FROM `keys` WHERE s_key = " + conf.connection.escape(s_key);
+    console.log(q);
+    conf.connection.query(q, function(err, rows, fields) {
+	if (!err)
+	{
+	    if (rows.length == 0) // key doesn't exist yet
+	    {
+		if ((m_key != undefined) && (m_key != ""))
+		{
+		    var q2 = "INSERT INTO `keys` (m_key, s_key) VALUES (" + conf.connection.escape(m_key) +
+			", " + conf.connection.escape(s_key) + ")";
+		    console.log(q2);
+		    conf.connection.query(q2, function(err, res, fields) {
+			if (!err)
+			{
+			    console.log(res.insertId);
+			    do_register_client(conf, response, res.insertId, baseurl, 1);
+			}
+			else
+			{
+			    console.log('Error while performing Query.');
+			    console.log(err);
+			    response.error500();
+			}
+		    });
+		}
+		else // m_key needed to register new key
+		{
+		    response.fail("m_key is missing");
+		}
+	    }
+	    else
+	    {
+		console.log("key found");
+		console.log(rows);
+		do_register_client(conf, response, baseurl, rows[0].id, 0); // if not the first to register key, not the master
+	    }
+	}
+	else
+	{
+	    console.log('Error while performing Query.');
+	    console.log(err);
+	    response.error500();
+	}
+    });
+}
+
 
 exports.get_list = get_list;
 exports.get_file = get_file;
