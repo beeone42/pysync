@@ -3,8 +3,8 @@ function get_list(conf, response, s_key) {
 	" FROM `files` " +
 	" LEFT JOIN `keys` ON `keys`.id = `files`.key_id " +
 	" LEFT JOIN `clients` on `clients`.id = `files`.client_id " +
-	" WHERE `clients`.is_master = 1 "
-	"   AND `keys`.s_key = '" + s_key + "' " +
+	" WHERE `clients`.is_master = 1 " +
+	"   AND `keys`.s_key = '" + conf.connection.escape(s_key) + "' " +
 	" GROUP BY path ORDER BY mtime DESC";
     console.log(q);
     conf.connection.query(q, function(err, rows, fields) {
@@ -26,8 +26,8 @@ function get_file(conf, response, s_key, path) {
 	" FROM `files` " +
 	" LEFT JOIN `keys` ON `keys`.id = `files`.key_id " +
 	" LEFT JOIN `clients` on `clients`.id = `files`.client_id " +
-	" WHERE `keys`.s_key = '" + s_key + "' " +
-	"   AND `files`.path = '" + path + "'";
+	" WHERE `keys`.s_key = '" + conf.connection.escape(s_key) + "' " +
+	"   AND `files`.path = '" + conf.connection.escape(path) + "'";
     console.log(q);
     conf.connection.query(q, function(err, rows, fields) {
 	if (!err)
@@ -44,5 +44,11 @@ function get_file(conf, response, s_key, path) {
 
 }
 
+function put_list(conf, response, s_key, files) {
+    console.log(files);
+    response.error500();
+}
+
 exports.get_list = get_list;
 exports.get_file = get_file;
+exports.put_list = put_list;

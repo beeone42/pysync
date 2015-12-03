@@ -32,5 +32,6 @@ var VERSION = "v1";
 handle["/"] = requestHandlers.hello;
 handle["/api/" + VERSION + "/get_list"] = requestHandlers.get_list;
 handle["/api/" + VERSION +"/get_file"] = requestHandlers.get_file;
+handle["/api/" + VERSION +"/put_list"] = requestHandlers.put_list;
 
 server.start(conf, router.route, handle);

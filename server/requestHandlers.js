@@ -43,6 +43,7 @@ function get_file(conf, response, qs, postData) {
 
 function put_list(conf, response, qs, postData) {
     console.log(postData);
+    conf.db.put_list(conf, response, qs.s_key, JSON.parse(querystring.parse(postData).data));
 }
 
 exports.hello = hello;
