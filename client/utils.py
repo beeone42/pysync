@@ -42,7 +42,7 @@ def scan_directory(path, mask):
 		list_of_file = {}
 		for f in glob.glob(mask):
 			statinfo = os.stat(f)
-			list_of_file[f] = str(statinfo.st_size) + "@" + str(statinfo.st_mtime)
+			list_of_file[f] = str(statinfo.st_size) + "@" + str(time.strftime("%Y-%m-%dT%H:%M:%SZ", (time.gmtime(statinfo.st_mtime))))
 		return list_of_file
 	except Exception as e:
 		print e
@@ -64,14 +64,16 @@ Make a json with the dic from scan_directory
 """
 
 def generate_json(dic):
-	response = []
-	files = []
-	key = "this_is_the_key"
-	response.append({'key' : key})
-	for data in dic:
-		files.append({data : [dic[data].split("@")[0], dic[data].split("@")[1]]})
-	response.append({'files' : files})
-	return response
+	list_array = []
+	for item in dic:
+		obj_json = {}
+		path = os.getcwd() + "/" + item
+		obj_json["path"] = path
+		obj_json["size"] = dic[item].split('@')[0]
+		obj_json["mtime"] = dic[item].split('@')[1]
+		obj_json["md5"] = str(md5(path))
+		list_array.append(obj_json)
+	print json.dumps(list_array)
 
 
 """
@@ -89,3 +91,4 @@ diff the server list and slave list and output what need to be uploaded
 def diff(list_m, list_s):
 	pass
 
+generate_json(scan_directory("/Users/jacob/projects/python/pysync/client", ""))

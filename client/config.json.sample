@@ -4,8 +4,8 @@
 	"folders":{
 		"CDN":{
 			"path":"\/space\/cdn\/",
-			"master_secret":"",
-			"slave_secret":"qwerty9876543210"
+			"m_key":"",
+			"s_key":"qwerty9876543210"
 		},
 		"pictures":{
 			"path":"\/home\/John\/Pictures\/",
