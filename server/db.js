@@ -69,7 +69,18 @@ function do_register_client(conf, response, key_id, baseurl, is_master)
 		    conf.connection.escape(is_master) +
 		    ")";
 		console.log(q2);
-		response.json({"client_id":"42"});
+		conf.connection.query(q2, function(err, res, fields) {
+		    if (!err)
+		    {
+			response.json({"client_id":res.insertId});
+		    }
+		    else
+		    {
+			console.log('Error while performing Query.');
+			console.log(err);
+			response.error500();
+		    }
+		});
 	    }
 	}
 	else
@@ -119,7 +130,7 @@ function register_client(conf, response, m_key, s_key, baseurl)
 	    {
 		console.log("key found");
 		console.log(rows);
-		do_register_client(conf, response, baseurl, rows[0].id, 0); // if not the first to register key, not the master
+		do_register_client(conf, response, rows[0].id, baseurl, 0); // if not the first to register key, not the master
 	    }
 	}
 	else
