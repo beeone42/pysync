@@ -1,21 +1,8 @@
 #!/usr/bin/env python
 
-"""
-TODO
+import os, json, sys, glob, hashlib, time, datetime, json, urllib2, urllib
 
-foreach (config.paths as p)
-
-list_master = dl list from server(p.slave_key)
-list_local = create local list
-if config_master_key != "":
-	upload(dff(list_master, list_local), p.master_key, p.slave_key)
-else
-	download(dff(list_local, list_master), p.slave_key)
-
-"""
-import os, json, sys, glob, hashlib, time, datetime, json
-
-CONFIG_FILE = 'config.json.sample'
+CONFIG_FILE = 'config.json'
 
 """
 Open and load a file at the json format
@@ -91,4 +78,64 @@ diff the server list and slave list and output what need to be uploaded
 def diff(list_m, list_s):
 	pass
 
-generate_json(scan_directory("/Users/jacob/projects/python/pysync/client", ""))
+"""
+request to register client
+"""
+
+def register_client():
+	with open(CONFIG_FILE, 'r') as f:
+		conf = json.loads(f.read())
+		s_url = conf['server_url']
+		version = conf['api_version']
+		server_pass = conf['server_password']
+		s_key = conf['folders']['CDN']['s_key']
+		base_url = conf['folders']['CDN']['baseurl']
+		data = {}
+		data['s_key'] = s_key
+		data['auth'] = server_pass
+		data['baseurl'] = base_url
+		url_values = urllib.urlencode(data)
+		url = s_url + "/api/" + version + '/register_client?' + url_values
+		print url
+		# data = urllib2.urlopen(url)
+
+"""
+request to put list
+"""
+
+def put_list():
+	pass
+
+#generate_json(scan_directory("/Users/jacob/projects/python/pysync/client", ""))
+register_client()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
