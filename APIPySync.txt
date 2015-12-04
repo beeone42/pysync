@@ -50,7 +50,7 @@ while (true)
         {
 if (!isset(folder.client_id))
 {
-folder.client_id = register_client(auth, folder.s_key, folder.baseurl);
+folder.client_id = register_client(auth, folder.s_key, m_key, folder.baseurl);
                 }
                 master_list = get_list(auth, folder.s_key);
                 local_list = build_local_list(folder.path);
@@ -68,10 +68,13 @@ folder.client_id = register_client(auth, folder.s_key, folder.baseurl);
                 }
                 else // the master doesn't need to dl anything, just publish his file list
                 {
-                        // remove file not on master anymore
-                        del_list(auth, folder.m_key, folder.s_key, diff); 
                         diff = diff_list(local_list, master_list); // reverse diff
-                        put_list(auth, folder.m_key, folder.s_key, diff);
+                        if (diff.length > 0)
+                        {
+                        // remove file list
+                                reset_list(auth, folder.client_id, folder.s_key); 
+                                put_list(auth, folder.m_key, folder.s_key, diff);
+}
                 }
 }
 }
@@ -139,7 +142,7 @@ GET_LIST: obtenir la liste des fichiers correspondant à une SLAVE key
 
 Requête:
 - commande: get_list
-- méthode: GET ou POST
+- méthode: GET
 
 
 Paramètres requis:
@@ -190,7 +193,7 @@ GET_FILE: obtenir les adresses d'un fichier correspondant à une SLAVE key et un
 
 Requête:
 - commande: get_file
-- méthode: GET ou POST
+- méthode: GET
 
 
 Paramètres requis:
@@ -239,6 +242,30 @@ réponse:
 ________________
 
 
+RESET_LIST: remettre à zéro la liste des fichiers correspondant à une SLAVE key et un CLIENT_ID
+
+
+Requête:
+- commande: reset_list
+- méthode: GET
+
+
+Paramètres requis:
+- s_key: la cle slave
+- client_id: l'id renvoyé par REGISTER_CLIENT
+- auth: le mot de passe du serveur
+
+
+Réponse:
+- success: TRUE si la requête a réussi, sinon FALSE
+- error: le détail de l'erreur en cas d'échec
+
+
+Exemple:
+http://localhost:8000/api/v1/reset_list?s_key=slave_secret&auth=ChangeMe&client_id=3
+________________
+
+
 PUT_LIST: publier la liste des fichiers locaux correspondant à une SLAVE ou une MASTER key
 
 
@@ -249,6 +276,7 @@ Requête:
 
 Paramètres requis:
 - s_key: la cle slave
+- client_id: l'id renvoyé par REGISTER_CLIENT
 - auth: le mot de passe du serveur
 - data: le tableau au format JSON des fichiers (voir format en dessous):
 
@@ -283,4 +311,4 @@ Exemple de tableau des fichiers:
 
 
 
-curl -X POST -d 'data=[{"path": "toto.txt","size":"42","mtime":"2015-12-01T16:19:35.000Z","md5": "8e8c20055a1c981eaceb45526b461159"},{"path":"config.json","size":"100","mtime":"2015-12-01T16:27:50.000Z","md5":"06b2d3b23dce96e1619d2b53d6c947ec"}]' 'http://localhost:8000/api/v1/put_list?s_key=slave_secret&auth=ChangeMe'
+curl -X POST -d 's_key=slave_secret&auth=ChangeMe&client_id=3&data=[{"path": "toto.txt","size":"42","mtime":"2015-12-01T16:19:35.000Z","md5": "8e8c20055a1c981eaceb45526b461159"},{"path":"config.json","size":"100","mtime":"2015-12-01T16:27:50.000Z","md5":"06b2d3b23dce96e1619d2b53d6c947ec"}]' 'http://localhost:8000/api/v1/put_list'
