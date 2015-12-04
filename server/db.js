@@ -16,7 +16,7 @@ function get_list(conf, response, s_key) {
 	else
 	{
 	    console.log('Error while performing Query.');
-	    response.error500();
+	    response.fail(err);
 	}
     });
 }
@@ -38,7 +38,7 @@ function get_file(conf, response, s_key, path) {
 	else
 	{
 	    console.log('Error while performing Query.');
-	    response.error500();
+	    response.fail(err);
 	}
     });
 
@@ -87,7 +87,7 @@ function put_list(conf, response, client_id, s_key, files) {
 	}
 	else
 	{
-	    response.error500();
+	    response.fail(err);
 	}
     });
 }
@@ -108,7 +108,7 @@ function reset_list(conf, response, client_id, s_key) {
 		    if (!err)
 		    {
 			console.log('The solution is: ', rows);
-			response.json(rows);
+			response.json({"affectedRows":rows.affectedRows});
 		    }
 		    else
 		    {
@@ -151,7 +151,7 @@ function do_register_client(conf, response, key_id, baseurl, is_master)
 		    {
 			console.log('Error while performing Query.');
 			console.log(err);
-			response.error500();
+			response.fail(err);
 		    }
 		});
 	    }
@@ -160,7 +160,7 @@ function do_register_client(conf, response, key_id, baseurl, is_master)
 	{
 	    console.log('Error while performing Query.');
 	    console.log(err);
-	    response.error500();
+	    response.fail(err);
 	}
     });
 }
@@ -190,7 +190,7 @@ function register_client(conf, response, m_key, s_key, baseurl)
 			{
 			    console.log('Error while performing Query.');
 			    console.log(err);
-			    response.error500();
+			    response.fail(err);
 			}
 		    });
 		}
@@ -210,7 +210,7 @@ function register_client(conf, response, m_key, s_key, baseurl)
 	{
 	    console.log('Error while performing Query.');
 	    console.log(err);
-	    response.error500();
+	    response.fail(err);
 	}
     });
 }
