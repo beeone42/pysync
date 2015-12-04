@@ -5,7 +5,7 @@ function get_list(conf, response, s_key) {
 	" LEFT JOIN `clients` on `clients`.id = `files`.client_id " +
 	" WHERE `clients`.is_master = 1 " +
 	"   AND `keys`.s_key = " + conf.connection.escape(s_key) +
-	" GROUP BY path ORDER BY mtime DESC";
+	" ORDER BY mtime DESC";
     console.log(q);
     conf.connection.query(q, function(err, rows, fields) {
 	if (!err)
