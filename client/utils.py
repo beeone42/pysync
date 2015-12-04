@@ -89,15 +89,17 @@ def register_client():
 		version = conf['api_version']
 		server_pass = conf['server_password']
 		s_key = conf['folders']['CDN']['s_key']
+		m_key = conf['folders']['CDN']['m_key']
 		base_url = conf['folders']['CDN']['baseurl']
 		data = {}
 		data['s_key'] = s_key
+		data['m_key'] = m_key
 		data['auth'] = server_pass
 		data['baseurl'] = base_url
 		url_values = urllib.urlencode(data)
 		url = s_url + "/api/" + version + '/register_client?' + url_values
 		print url
-		# data = urllib2.urlopen(url)
+		data = urllib2.urlopen(url)
 
 """
 request to put list
