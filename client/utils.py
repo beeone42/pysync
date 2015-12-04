@@ -97,10 +97,15 @@ def register_client():
 		return json.loads(res.text)['data']['client_id']
 
 """
-request to put list
+request to put list,  TODO avant faire un reset si diff ok ou pas
 """
 
 def put_list():
+
+	#  VOIR TODO ABOVE
+
+	reset_list()
+
 	with open(CONFIG_FILE, 'r') as f:
 		conf = json.loads(f.read())
 		version = conf['api_version']
@@ -122,14 +127,33 @@ reset a file list_array
 def reset_list():
 	with open(CONFIG_FILE, 'r') as f:
 		conf = json.loads(f.read())
-		s_url = conf['server_url']
 		version = conf['api_version']
-		server_pass = conf['server_password']
+		data = {}
+		data['s_key'] = conf['folders']['CDN']['s_key']
+		data['auth'] = conf['server_password']
 		data['client_id'] = register_client()
-		s_key = conf['folders']['CDN']['s_key']
 		url = conf['server_url'] + "/api/" + version + '/reset_list'
+		res = requests.get(url, params=data)
 
-put_list()
+
+"""
+get list, get the file list of a slave s_key
+"""
+
+def get_list():
+	with open(CONFIG_FILE, 'r') as f:
+		conf = json.loads(f.read())	
+		version = conf['api_version']
+		data = {}
+		data['s_key'] = conf['folders']['CDN']['s_key']
+		data['auth'] = conf['server_password']
+		url = conf['server_url'] + "/api/" + version + '/get_list'
+		res = requests.get(url, params=data)
+		print res.url
+		print res.text
+
+get_list()
+
 
 
 
