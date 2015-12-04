@@ -1,8 +1,19 @@
 {
     "name": "pysync",
     "version": "0.0.1",
+    "main": "index.js",
+    "scripts": {"start": "node index.js"},
+    "license": "FSFUL",
+    "description": "server for pysync p2p file sync system",
+    "homepage": "https://github.com/beeone42/pysync",
+    "url": "https://github.com/beeone42/pysync/issues",
+    "private":true,
+    "repository": {
+	"type" : "git",
+	"url" : "https://github.com/beeone42/pysync.git"
+    },
     "dependencies": {
-	"nconf": "^0.8.2",
-	"mysql": "^2.5.4"
+	"nconf": "lastest",
+	"mysql": "lastest"
     }
 }
