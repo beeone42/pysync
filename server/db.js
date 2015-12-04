@@ -92,6 +92,36 @@ function put_list(conf, response, client_id, s_key, files) {
     });
 }
 
+function reset_list(conf, response, client_id, s_key) {
+    var q = "SELECT `keys`.id FROM `keys` WHERE s_key = " + conf.connection.escape(s_key);
+    console.log(q);
+    conf.connection.query(q, function(err, rows, fields) {
+	if (!err)
+	{
+	    if (rows.length >= 0) // key already exist yet
+	    {
+		var key_id = rows[0].id;
+		var q2 = "DELETE FROM `files` WHERE key_id = " + conf.connection.escape(key_id) + 
+		    " AND client_id = " + conf.connection.escape(client_id);
+		console.log(q2);
+		conf.connection.query(q2, function(err, rows, fields) {
+		    if (!err)
+		    {
+			console.log('The solution is: ', rows);
+			response.json(rows);
+		    }
+		    else
+		    {
+			console.log('Error while performing Query.');
+			response.fail(err);
+		    }
+		});
+	    }
+	}
+    });
+}
+
+
 function do_register_client(conf, response, key_id, baseurl, is_master)
 {
     var q = "SELECT clients.id FROM clients " +
@@ -189,5 +219,6 @@ function register_client(conf, response, m_key, s_key, baseurl)
 exports.get_list = get_list;
 exports.get_file = get_file;
 exports.put_list = put_list;
+exports.reset_list = reset_list;
 exports.register_client = register_client;
 
