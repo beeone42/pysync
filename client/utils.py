@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, json, sys, glob, hashlib, time, datetime, json, urllib2, urllib
+import os, json, sys, glob, hashlib, time, datetime, json, requests
 
 CONFIG_FILE = 'config.json'
 
@@ -60,7 +60,7 @@ def generate_json(dic):
 		obj_json["mtime"] = dic[item].split('@')[1]
 		obj_json["md5"] = str(md5(path))
 		list_array.append(obj_json)
-	print json.dumps(list_array)
+	return json.dumps(list_array)
 
 
 """
@@ -85,32 +85,51 @@ request to register client
 def register_client():
 	with open(CONFIG_FILE, 'r') as f:
 		conf = json.loads(f.read())
-		s_url = conf['server_url']
 		version = conf['api_version']
-		server_pass = conf['server_password']
-		s_key = conf['folders']['CDN']['s_key']
-		m_key = conf['folders']['CDN']['m_key']
-		base_url = conf['folders']['CDN']['baseurl']
 		data = {}
-		data['s_key'] = s_key
-		data['m_key'] = m_key
-		data['auth'] = server_pass
-		data['baseurl'] = base_url
-		url_values = urllib.urlencode(data)
-		url = s_url + "/api/" + version + '/register_client?' + url_values
-		print url
-		data = urllib2.urlopen(url)
+		data['s_key'] = conf['folders']['CDN']['s_key']
+		data['m_key'] = conf['folders']['CDN']['m_key']
+		data['auth'] = conf['server_password']
+		data['baseurl'] = conf['folders']['CDN']['baseurl']
+		url = conf['server_url'] + "/api/" + version + '/register_client'
+		res = requests.get(url, params=data)
+		print res.text
+		return json.loads(res.text)['data']['client_id']
 
 """
 request to put list
 """
 
 def put_list():
-	pass
+	with open(CONFIG_FILE, 'r') as f:
+		conf = json.loads(f.read())
+		version = conf['api_version']
+		data = {}
+		data['s_key'] = conf['folders']['CDN']['s_key']
+		data['auth'] = conf['server_password']
+		data['client_id'] = register_client()
+		data['data'] = generate_json(scan_directory("/Users/jacob/projects/python/pysync/client", ""))
+		url = conf['server_url'] + "/api/" + version + '/put_list'
+		res = requests.post(url, data=data)
+		print res.url
+		print res.text
 
-#generate_json(scan_directory("/Users/jacob/projects/python/pysync/client", ""))
-register_client()
 
+"""
+reset a file list_array
+"""
+
+def reset_list():
+	with open(CONFIG_FILE, 'r') as f:
+		conf = json.loads(f.read())
+		s_url = conf['server_url']
+		version = conf['api_version']
+		server_pass = conf['server_password']
+		data['client_id'] = register_client()
+		s_key = conf['folders']['CDN']['s_key']
+		url = conf['server_url'] + "/api/" + version + '/reset_list'
+
+put_list()
 
 
 
