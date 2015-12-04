@@ -1,12 +1,12 @@
-function route(conf, handle, pathname, response, qs, postData) {
+function route(conf, handle, pathname, response, qs, pd) {
     console.log("Start processing URL " + pathname + ".");
 
-    if (qs.auth != conf.server_password)
+    if ((qs.auth != conf.server_password) && (pd.auth != conf.server_password))
 	response.error401();
     else
     if (typeof handle[pathname] === 'function') {
 	try {
-            return (handle[pathname](conf, response, qs, postData));
+            return (handle[pathname](conf, response, qs, pd));
 	} catch (ex) {
 	    console.trace(ex)
 	    response.error500();

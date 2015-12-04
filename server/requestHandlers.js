@@ -24,29 +24,29 @@ function walk(path)
     return (res);
 }
 
-function hello(conf, response, qs, postData) {
+function hello(conf, response, qs, pd) {
     response.writeHead(200, {"Content-Type": "text/plain"});
     response.write("Hello");
     response.end();
 }
 
-function get_list(conf, response, qs, postData) {
+function get_list(conf, response, qs, pd) {
     //console.log(url.parse(request.url));
     //console.log(JSON.stringify(request.querystring));
     // res = walk("."); response.json(res);
     conf.db.get_list(conf, response, qs.s_key);
 }
 
-function get_file(conf, response, qs, postData) {
+function get_file(conf, response, qs, pd) {
     conf.db.get_file(conf, response, qs.s_key, qs.path);
 }
 
-function put_list(conf, response, qs, postData) {
-    console.log(postData);
-    conf.db.put_list(conf, response, qs.client_id, qs.s_key, JSON.parse(querystring.parse(postData).data));
+function put_list(conf, response, qs, pd) {
+    console.log(pd);
+    conf.db.put_list(conf, response, pd.client_id, pd.s_key, JSON.parse(pd.data));
 }
 
-function register_client(conf, response, qs, postData) {
+function register_client(conf, response, qs, pd) {
     console.log(qs);
     conf.db.register_client(conf, response, qs.m_key, qs.s_key, qs.baseurl);
 }

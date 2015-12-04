@@ -71,8 +71,10 @@ function start(conf, route, handle) {
 	request.addListener("end", function() {
 	    //console.log(request);
 	    var qs = querystring.parse(url.parse(request.url).query);
+	    var pd = querystring.parse(postData);
 	    console.log(JSON.stringify(qs));
-	    route(conf, handle, pathname, response, qs, postData);
+	    console.log(JSON.stringify(pd));
+	    route(conf, handle, pathname, response, qs, pd);
 	});
     }
     http.createServer(onRequest).listen(conf.port);
