@@ -167,10 +167,10 @@ START POINT
 """
 
 if __name__ == "__main__":
-	f = open(CONFIG_FILE, 'r')
-	content = f.read()
-	# put_list(content)
-	get_list(content)
+	with open(CONFIG_FILE, 'r') as f:
+		content = f.read()
+		# put_list(content)
+		get_list(content)
 
 
 
