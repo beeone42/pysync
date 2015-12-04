@@ -28,8 +28,9 @@ def scan_directory(path, mask):
 		os.chdir(path)
 		list_of_file = {}
 		for f in glob.glob(mask):
-			statinfo = os.stat(f)
-			list_of_file[f] = str(statinfo.st_size) + "@" + str(time.strftime("%Y-%m-%dT%H:%M:%SZ", (time.gmtime(statinfo.st_mtime))))
+			if os.path.isdir(f) == False:
+				statinfo = os.stat(f)
+				list_of_file[f] = str(statinfo.st_size) + "@" + str(time.strftime("%Y-%m-%dT%H:%M:%SZ", (time.gmtime(statinfo.st_mtime))))
 		return list_of_file
 	except Exception as e:
 		print e
@@ -79,81 +80,97 @@ def diff(list_m, list_s):
 	pass
 
 """
-request to register client
+GET request to register client
 """
 
-def register_client():
-	with open(CONFIG_FILE, 'r') as f:
-		conf = json.loads(f.read())
-		version = conf['api_version']
-		data = {}
-		data['s_key'] = conf['folders']['CDN']['s_key']
-		data['m_key'] = conf['folders']['CDN']['m_key']
-		data['auth'] = conf['server_password']
-		data['baseurl'] = conf['folders']['CDN']['baseurl']
-		url = conf['server_url'] + "/api/" + version + '/register_client'
-		res = requests.get(url, params=data)
-		print res.text
-		return json.loads(res.text)['data']['client_id']
+def register_client(content):
+	conf = json.loads(content)
+	version = conf['api_version']
+	data = {}
+	data['s_key'] = conf['folders']['CDN']['s_key']
+	data['m_key'] = conf['folders']['CDN']['m_key']
+	data['auth'] = conf['server_password']
+	data['baseurl'] = conf['folders']['CDN']['baseurl']
+	url = conf['server_url'] + "/api/" + version + '/register_client'
+	res = requests.get(url, params=data)
+	print res.text
+	return json.loads(res.text)['data']['client_id']
 
 """
-request to put list,  TODO avant faire un reset si diff ok ou pas
+POST request to put list,  TODO avant faire un reset si diff ok ou pas
 """
 
-def put_list():
+def put_list(content):
 
 	#  VOIR TODO ABOVE
 
-	reset_list()
+	reset_list(content)
 
-	with open(CONFIG_FILE, 'r') as f:
-		conf = json.loads(f.read())
-		version = conf['api_version']
-		data = {}
-		data['s_key'] = conf['folders']['CDN']['s_key']
-		data['auth'] = conf['server_password']
-		data['client_id'] = register_client()
-		data['data'] = generate_json(scan_directory(conf['folders']['CDN']['path'], ""))
-		url = conf['server_url'] + "/api/" + version + '/put_list'
-		res = requests.post(url, data=data)
-		print res.url
-		print res.text
-
-
-"""
-reset a file list_array
-"""
-
-def reset_list():
-	with open(CONFIG_FILE, 'r') as f:
-		conf = json.loads(f.read())
-		version = conf['api_version']
-		data = {}
-		data['s_key'] = conf['folders']['CDN']['s_key']
-		data['auth'] = conf['server_password']
-		data['client_id'] = register_client()
-		url = conf['server_url'] + "/api/" + version + '/reset_list'
-		res = requests.get(url, params=data)
+	conf = json.loads(content)
+	version = conf['api_version']
+	data = {}
+	data['s_key'] = conf['folders']['CDN']['s_key']
+	data['auth'] = conf['server_password']
+	data['client_id'] = register_client(content)
+	data['data'] = generate_json(scan_directory(conf['folders']['CDN']['path'], ""))
+	url = conf['server_url'] + "/api/" + version + '/put_list'
+	res = requests.post(url, data=data)
+	print res.url
+	print res.text
 
 
 """
-get list, get the file list of a slave s_key
+GET reset a file list_array
 """
 
-def get_list():
-	with open(CONFIG_FILE, 'r') as f:
-		conf = json.loads(f.read())	
-		version = conf['api_version']
-		data = {}
-		data['s_key'] = conf['folders']['CDN']['s_key']
-		data['auth'] = conf['server_password']
-		url = conf['server_url'] + "/api/" + version + '/get_list'
-		res = requests.get(url, params=data)
-		print res.url
-		print res.text
+def reset_list(content):
+	conf = json.loads(content)
+	version = conf['api_version']
+	data = {}
+	data['s_key'] = conf['folders']['CDN']['s_key']
+	data['auth'] = conf['server_password']
+	data['client_id'] = register_client(content)
+	url = conf['server_url'] + "/api/" + version + '/reset_list'
+	res = requests.get(url, params=data)
 
-put_list()
-get_list()
+
+"""
+GET get_list, get the file list of a slave s_key
+"""
+
+def get_list(content):
+	conf = json.loads(content)	
+	version = conf['api_version']
+	data = {}
+	data['s_key'] = conf['folders']['CDN']['s_key']
+	data['auth'] = conf['server_password']
+	url = conf['server_url'] + "/api/" + version + '/get_list'
+	res = requests.get(url, params=data)
+	print res.url
+	print res.text
+
+
+"""
+GET get_file
+"""
+
+# def get_file():
+# 	with open(CONFIG_FILE, 'r') as f:
+# 		conf = json.loads(f.read())
+# 		version = conf['api_version']
+# 		data = {}
+# 		data['s_key'] = conf['folders']['CDN']['s_key']
+# 		data['auth'] = conf['server_password']
+
+"""
+START POINT
+"""
+
+if __name__ == "__main__":
+	f = open(CONFIG_FILE, 'r')
+	content = f.read()
+	# put_list(content)
+	get_list(content)
 
 
 
