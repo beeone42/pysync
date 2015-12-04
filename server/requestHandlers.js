@@ -43,7 +43,10 @@ function get_file(conf, response, qs, pd) {
 
 function put_list(conf, response, qs, pd) {
     console.log(pd);
-    conf.db.put_list(conf, response, pd.client_id, pd.s_key, JSON.parse(pd.data));
+    if (pd.data == undefined)
+	response.fail("data field missing");
+    else
+	conf.db.put_list(conf, response, pd.client_id, pd.s_key, JSON.parse(pd.data));
 }
 
 function reset_list(conf, response, qs, pd) {
