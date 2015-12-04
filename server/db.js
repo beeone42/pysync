@@ -44,6 +44,11 @@ function get_file(conf, response, s_key, path) {
 
 }
 
+function date_mysql(d)
+{
+    return (d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + " " + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds());
+}
+
 function put_list(conf, response, client_id, s_key, files) {
     console.log(files);
     var q = "SELECT `keys`.id FROM `keys` WHERE s_key = " + conf.connection.escape(s_key);
@@ -64,7 +69,7 @@ function put_list(conf, response, client_id, s_key, files) {
 			conf.connection.escape(client_id) + ", " +
 			conf.connection.escape(files[i].path) + ", " +
 			conf.connection.escape(files[i].size) + "," +
-			conf.connection.escape(new Date(Date.parse(files[i].mtime)).toString()) + ", " +
+			conf.connection.escape(date_mysql(new Date(Date.parse(files[i].mtime)))) + ", " +
 			conf.connection.escape(files[i].md5) + ") ";
 		}
 		console.log(q2);
