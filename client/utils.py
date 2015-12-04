@@ -152,6 +152,7 @@ def get_list():
 		print res.url
 		print res.text
 
+put_list()
 get_list()
 
 
