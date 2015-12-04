@@ -73,9 +73,6 @@ function reset_list(conf, response, qs, pd) {
 }
 
 function register_client(conf, response, qs, pd) {
-    if (qs.client_id == undefined)
-	response.fail("client_id field is missing in GET");
-    else
     if (qs.s_key == undefined)
 	response.fail("s_key field is missing in GET");
     else
