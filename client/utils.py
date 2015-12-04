@@ -108,7 +108,7 @@ def put_list():
 		data['s_key'] = conf['folders']['CDN']['s_key']
 		data['auth'] = conf['server_password']
 		data['client_id'] = register_client()
-		data['data'] = generate_json(scan_directory("/Users/jacob/projects/python/pysync/client", ""))
+		data['data'] = generate_json(scan_directory(conf['folders']['CDN']['path'], ""))
 		url = conf['server_url'] + "/api/" + version + '/put_list'
 		res = requests.post(url, data=data)
 		print res.url
