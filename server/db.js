@@ -64,7 +64,7 @@ function put_list(conf, response, client_id, s_key, files) {
 			conf.connection.escape(client_id) + ", " +
 			conf.connection.escape(files[i].path) + ", " +
 			conf.connection.escape(files[i].size) + "," +
-			conf.connection.escape(new Date(Date.parse(files[i].mtime)).toLocaleString()) + ", " +
+			conf.connection.escape(new Date(Date.parse(files[i].mtime)).toString()) + ", " +
 			conf.connection.escape(files[i].md5) + ") ";
 		}
 		console.log(q2);

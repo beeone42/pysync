@@ -2,6 +2,7 @@ var querystring = require("querystring");
 var fs = require("fs");
 var url = require('url');
 
+// walk local file system just for debug purpose
 function walk(path)
 {
     console.log("walk " + path);
@@ -31,30 +32,56 @@ function hello(conf, response, qs, pd) {
 }
 
 function get_list(conf, response, qs, pd) {
-    //console.log(url.parse(request.url));
-    //console.log(JSON.stringify(request.querystring));
-    // res = walk("."); response.json(res);
-    conf.db.get_list(conf, response, qs.s_key);
+    if (qs.s_key == undefined)
+	response.fail("s_key field is missing in GET");
+    else
+	conf.db.get_list(conf, response, qs.s_key);
 }
 
 function get_file(conf, response, qs, pd) {
-    conf.db.get_file(conf, response, qs.s_key, qs.path);
+    if (qs.s_key == undefined)
+	response.fail("s_key field is missing in GET");
+    else
+    if (qs.path == undefined)
+	response.fail("path field is missing in GET");
+    else
+	conf.db.get_file(conf, response, qs.s_key, qs.path);
 }
 
 function put_list(conf, response, qs, pd) {
     console.log(pd);
+    if (pd.client_id == undefined)
+	response.fail("client_id field is missing in POST");
+    else
+    if (pd.s_key == undefined)
+	response.fail("s_key field is missing in POST");
+    else
     if (pd.data == undefined)
-	response.fail("data field missing");
+	response.fail("data field is missing in POST");
     else
 	conf.db.put_list(conf, response, pd.client_id, pd.s_key, JSON.parse(pd.data));
 }
 
 function reset_list(conf, response, qs, pd) {
-    conf.db.reset_list(conf, response, qs.client_id, qs.s_key);
+    if (qs.client_id == undefined)
+	response.fail("client_id field is missing in GET");
+    else
+    if (qs.s_key == undefined)
+	response.fail("s_key field is missing in GET");
+    else
+	conf.db.reset_list(conf, response, qs.client_id, qs.s_key);
 }
 
 function register_client(conf, response, qs, pd) {
-    console.log(qs);
+    if (qs.client_id == undefined)
+	response.fail("client_id field is missing in GET");
+    else
+    if (qs.s_key == undefined)
+	response.fail("s_key field is missing in GET");
+    else
+    if (qs.baseurl == undefined)
+	response.fail("baseurl field is missing in GET");
+    else
     conf.db.register_client(conf, response, qs.m_key, qs.s_key, qs.baseurl);
 }
 
