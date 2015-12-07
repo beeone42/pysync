@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os, json, sys, glob, hashlib, time, datetime, json, requests
+from collections import defaultdict
 
 CONFIG_FILE = 'config.json'
 
@@ -86,15 +87,22 @@ GET request to register client
 def register_client(content):
 	conf = json.loads(content)
 	version = conf['api_version']
-	data = {}
-	data['s_key'] = conf['folders']['CDN']['s_key']
-	data['m_key'] = conf['folders']['CDN']['m_key']
-	data['auth'] = conf['server_password']
-	data['baseurl'] = conf['folders']['CDN']['baseurl']
-	url = conf['server_url'] + "/api/" + version + '/register_client'
-	res = requests.get(url, params=data)
-	print res.text
-	return json.loads(res.text)['data']['client_id']
+	result = {}
+	for folder in conf['folders']:
+		data = {}
+		data['s_key'] = conf['folders'][folder]['s_key']
+		data['m_key'] = conf['folders'][folder]['m_key']
+		data['auth'] = conf['server_password']
+		data['baseurl'] = conf['folders'][folder]['baseurl']
+		url = conf['server_url'] + "/api/" + version + '/register_client'
+		res = requests.get(url, params=data)
+		if str(json.loads(res.text)['succes']) != "True":
+			print "register client failed for folder [%s]." % folder
+			break
+		result[folder] = json.loads(res.text)['data']['client_id']
+		print res.text
+	print result
+	return result
 
 """
 POST request to put list,  TODO avant faire un reset si diff ok ou pas
@@ -108,15 +116,20 @@ def put_list(content):
 
 	conf = json.loads(content)
 	version = conf['api_version']
-	data = {}
-	data['s_key'] = conf['folders']['CDN']['s_key']
-	data['auth'] = conf['server_password']
-	data['client_id'] = register_client(content)
-	data['data'] = generate_json(scan_directory(conf['folders']['CDN']['path'], ""))
-	url = conf['server_url'] + "/api/" + version + '/put_list'
-	res = requests.post(url, data=data)
-	print res.url
-	print res.text
+	for folder in conf['folders']:
+		data = {}
+		data['s_key'] = conf['folders'][folder]['s_key']
+		data['auth'] = conf['server_password']
+		data['client_id'] = register_client(content)
+		data['data'] = generate_json(scan_directory(conf['folders'][folder]['path'], ""))
+		print generate_json(scan_directory(conf['folders'][folder]['path'], ""))
+		url = conf['server_url'] + "/api/" + version + '/put_list'
+		res = requests.post(url, data=data)
+		if str(json.loads(res.text)['succes']) != "True":
+			print "put list failed for folder [%s]." % folder
+			break
+		print res.url
+		print res.text
 
 
 """
@@ -126,12 +139,16 @@ GET reset a file list_array
 def reset_list(content):
 	conf = json.loads(content)
 	version = conf['api_version']
-	data = {}
-	data['s_key'] = conf['folders']['CDN']['s_key']
-	data['auth'] = conf['server_password']
-	data['client_id'] = register_client(content)
-	url = conf['server_url'] + "/api/" + version + '/reset_list'
-	res = requests.get(url, params=data)
+	for folder in conf['folders']:
+		data = {}
+		data['s_key'] = conf['folders'][folder]['s_key']
+		data['auth'] = conf['server_password']
+		data['client_id'] = register_client(content)
+		url = conf['server_url'] + "/api/" + version + '/reset_list'
+		res = requests.get(url, params=data)
+		if str(json.loads(res.text)['succes']) != "True":
+			print "reset list failed for folder [%s]." % folder
+			break
 
 
 """
@@ -141,13 +158,18 @@ GET get_list, get the file list of a slave s_key
 def get_list(content):
 	conf = json.loads(content)	
 	version = conf['api_version']
-	data = {}
-	data['s_key'] = conf['folders']['CDN']['s_key']
-	data['auth'] = conf['server_password']
-	url = conf['server_url'] + "/api/" + version + '/get_list'
-	res = requests.get(url, params=data)
-	print res.url
-	print res.text
+	for folder in conf['folders']:
+		print folder
+		data = {}
+		data['s_key'] = conf['folders'][folder]['s_key']
+		data['auth'] = conf['server_password']
+		url = conf['server_url'] + "/api/" + version + '/get_list'
+		res = requests.get(url, params=data)
+		if str(json.loads(res.text)['succes']) != "True":
+			print "get list failed for folder [%s]." % folder
+			break
+		# print res.url
+		print res.text
 
 
 """
@@ -169,6 +191,7 @@ START POINT
 if __name__ == "__main__":
 	with open(CONFIG_FILE, 'r') as f:
 		content = f.read()
+		# register_client(content)
 		# put_list(content)
 		get_list(content)
 
