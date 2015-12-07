@@ -25,10 +25,13 @@ If not mask is not mentionned, * is default
 def scan_directory(path, mask):
 	if mask == "":
 		mask = "*"
+	print "Sanning [%s] on [%s]." % (mask, path)
 	try:
 		os.chdir(path)
+		print "dir changed"
 		list_of_file = {}
 		for f in glob.glob(mask):
+			print "f:[%s]" % (f)
 			if os.path.isdir(f) == False:
 				statinfo = os.stat(f)
 				list_of_file[f] = str(statinfo.st_size) + "@" + str(time.strftime("%Y-%m-%dT%H:%M:%SZ", (time.gmtime(statinfo.st_mtime))))
@@ -116,16 +119,18 @@ def put_list(content):
 
 	conf = json.loads(content)
 	version = conf['api_version']
+	da = register_client(content)
 	for folder in conf['folders']:
 		data = {}
 		data['s_key'] = conf['folders'][folder]['s_key']
 		data['auth'] = conf['server_password']
-		data['client_id'] = register_client(content)
+		data['client_id'] = da[folder]
 		data['data'] = generate_json(scan_directory(conf['folders'][folder]['path'], ""))
-		print generate_json(scan_directory(conf['folders'][folder]['path'], ""))
 		url = conf['server_url'] + "/api/" + version + '/put_list'
 		res = requests.post(url, data=data)
-		if str(json.loads(res.text)['succes']) != "True":
+		result = json.loads(res.text)
+		print result
+		if str(result['succes']) != "True":
 			print "put list failed for folder [%s]." % folder
 			break
 		print res.url
@@ -139,11 +144,12 @@ GET reset a file list_array
 def reset_list(content):
 	conf = json.loads(content)
 	version = conf['api_version']
+	da = register_client(content)
 	for folder in conf['folders']:
 		data = {}
 		data['s_key'] = conf['folders'][folder]['s_key']
 		data['auth'] = conf['server_password']
-		data['client_id'] = register_client(content)
+		data['client_id'] = da[folder]
 		url = conf['server_url'] + "/api/" + version + '/reset_list'
 		res = requests.get(url, params=data)
 		if str(json.loads(res.text)['succes']) != "True":
@@ -158,6 +164,7 @@ GET get_list, get the file list of a slave s_key
 def get_list(content):
 	conf = json.loads(content)	
 	version = conf['api_version']
+	da = register_client(content)
 	for folder in conf['folders']:
 		print folder
 		data = {}
