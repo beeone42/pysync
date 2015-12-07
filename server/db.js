@@ -27,7 +27,8 @@ function get_file(conf, response, s_key, path) {
 	" LEFT JOIN `keys` ON `keys`.id = `files`.key_id " +
 	" LEFT JOIN `clients` on `clients`.id = `files`.client_id " +
 	" WHERE `keys`.s_key = " + conf.connection.escape(s_key) +
-	"   AND `files`.path = " + conf.connection.escape(path);
+	"   AND `files`.path = " + conf.connection.escape(path) +
+	" ORDER BY ptime DESC";
     console.log(q);
     conf.connection.query(q, function(err, rows, fields) {
 	if (!err)
@@ -60,7 +61,7 @@ function put_list(conf, response, client_id, s_key, files) {
 	    if (rows.length >= 0) // key already exist yet
 	    {
 		var key_id = rows[0].id;
-		var q2 = "INSERT INTO `files` (key_id, client_id, path, size, mtime, md5) VALUES ";
+		var q2 = "INSERT INTO `files` (key_id, client_id, path, size, mtime, ptime, md5) VALUES ";
 		for (i = 0; i < files.length; i++)
 		{
 		    if (i > 0)
@@ -71,6 +72,7 @@ function put_list(conf, response, client_id, s_key, files) {
 			conf.connection.escape(files[i].path) + ", " +
 			conf.connection.escape(files[i].size) + "," +
 			conf.connection.escape(date_mysql(new Date(Date.parse(files[i].mtime)))) + ", " +
+			" NOW(), " + 
 			conf.connection.escape(files[i].md5) + ") ";
 		}
 		console.log(q2);
