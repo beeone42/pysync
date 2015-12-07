@@ -31,7 +31,7 @@ def scan_directory(path, mask):
 		# print "dir changed"
 		list_of_file = {}
 		for f in glob.glob(mask):
-			# print "f:[%s]" % (f)
+			print "f:[%s]" % (f)
 			if os.path.isdir(f) == False:
 				statinfo = os.stat(f)
 				list_of_file[f] = str(statinfo.st_size) + "@" + str(time.strftime("%Y-%m-%dT%H:%M:%SZ", (time.gmtime(statinfo.st_mtime))))
@@ -45,11 +45,12 @@ Md5 checksum a file
 """
 
 def md5(file_name):
-    hash = hashlib.md5()
-    with open(file_name, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            hash.update(chunk)
-    return hash.hexdigest()
+        print "MD5: %s" % (file_name)
+        hash = hashlib.md5()
+        with open(file_name, "rb") as f:
+                for chunk in iter(lambda: f.read(4096), b""):
+                        hash.update(chunk)
+        return hash.hexdigest()
 
 """
 Make a json with the dic from scan_directory
@@ -59,7 +60,7 @@ def generate_json(dic):
 	list_array = []
 	for item in dic:
 		obj_json = {}
-		path = os.getcwd() + "/" + item
+		path = item
 		obj_json["path"] = path
 		obj_json["size"] = dic[item].split('@')[0]
 		obj_json["mtime"] = dic[item].split('@')[1]
@@ -195,7 +196,7 @@ def get_file(content):
 			data = {}
 			data['s_key'] = conf['folders'][folder]['s_key']
 			data['auth'] = conf['server_password']
-			data['path'] = conf['folders'][folder]['path'] + elem
+			data['path'] = elem
 			# print data['path']
 			url = conf['server_url'] + "/api/" + version + '/get_file'
 			res = requests.get(url, params=data)
@@ -209,10 +210,10 @@ START POINT
 if __name__ == "__main__":
 	with open(CONFIG_FILE, 'r') as f:
 		content = f.read()
-		# register_client(content)
-		# put_list(content)
+		register_client(content)
+		put_list(content)
 		# get_list(content)
-		get_file(content)
+		# get_file(content)
 
 
 
