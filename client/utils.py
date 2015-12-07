@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-import os, json, sys, glob, hashlib, time, datetime, json, requests
-from collections import defaultdict
+import os, json, sys, glob, hashlib, time, datetime, json, requests, wget
+
 
 CONFIG_FILE = 'config.json'
 
@@ -25,13 +25,13 @@ If not mask is not mentionned, * is default
 def scan_directory(path, mask):
 	if mask == "":
 		mask = "*"
-	print "Sanning [%s] on [%s]." % (mask, path)
+	# print "Sanning [%s] on [%s]." % (mask, path)
 	try:
 		os.chdir(path)
-		print "dir changed"
+		# print "dir changed"
 		list_of_file = {}
 		for f in glob.glob(mask):
-			print "f:[%s]" % (f)
+			# print "f:[%s]" % (f)
 			if os.path.isdir(f) == False:
 				statinfo = os.stat(f)
 				list_of_file[f] = str(statinfo.st_size) + "@" + str(time.strftime("%Y-%m-%dT%H:%M:%SZ", (time.gmtime(statinfo.st_mtime))))
@@ -165,31 +165,42 @@ def get_list(content):
 	conf = json.loads(content)	
 	version = conf['api_version']
 	da = register_client(content)
+	server_list = {}
 	for folder in conf['folders']:
-		print folder
+		# print folder
 		data = {}
 		data['s_key'] = conf['folders'][folder]['s_key']
 		data['auth'] = conf['server_password']
 		url = conf['server_url'] + "/api/" + version + '/get_list'
 		res = requests.get(url, params=data)
+		server_list[folder] = res.text
 		if str(json.loads(res.text)['succes']) != "True":
 			print "get list failed for folder [%s]." % folder
 			break
-		# print res.url
-		print res.text
+	return server_list
 
 
 """
 GET get_file
 """
 
-# def get_file():
-# 	with open(CONFIG_FILE, 'r') as f:
-# 		conf = json.loads(f.read())
-# 		version = conf['api_version']
-# 		data = {}
-# 		data['s_key'] = conf['folders']['CDN']['s_key']
-# 		data['auth'] = conf['server_password']
+def get_file(content):
+	conf = json.loads(content)	
+	version = conf['api_version']
+	server_list = get_list(content)
+	for folder in conf['folders']:
+		list_of_file = scan_directory(conf['folders'][folder]['path'], "")
+		for elem in list_of_file:
+			# print "============ %s =============" % (elem)
+			data = {}
+			data['s_key'] = conf['folders'][folder]['s_key']
+			data['auth'] = conf['server_password']
+			data['path'] = conf['folders'][folder]['path'] + elem
+			# print data['path']
+			url = conf['server_url'] + "/api/" + version + '/get_file'
+			res = requests.get(url, params=data)
+			url_file = json.loads(res.text)['data'][0]['path']
+			print data['path'].split('/')[-1]
 
 """
 START POINT
@@ -200,7 +211,8 @@ if __name__ == "__main__":
 		content = f.read()
 		# register_client(content)
 		# put_list(content)
-		get_list(content)
+		# get_list(content)
+		get_file(content)
 
 
 
