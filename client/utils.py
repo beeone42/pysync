@@ -45,12 +45,12 @@ Md5 checksum a file
 """
 
 def md5(file_name):
-        print "MD5: %s" % (file_name)
-        hash = hashlib.md5()
-        with open(file_name, "rb") as f:
-                for chunk in iter(lambda: f.read(4096), b""):
-                        hash.update(chunk)
-        return hash.hexdigest()
+		print "MD5: %s" % (file_name)
+		hash = hashlib.md5()
+		with open(file_name, "rb") as f:
+				for chunk in iter(lambda: f.read(4096), b""):
+						hash.update(chunk)
+		return hash.hexdigest()
 
 """
 Make a json with the dic from scan_directory
@@ -163,7 +163,7 @@ GET get_list, get the file list of a slave s_key
 """
 
 def get_list(conf, folder):
-        print(folder)
+	print(folder)
 	data = {}
 	data['s_key'] = folder['s_key']
 	data['auth'] = conf['server_password']
@@ -178,58 +178,35 @@ def get_list(conf, folder):
 GET dl_file
 """
 def get_file(conf, folder, path):
-        data = {}
-        data['s_key'] = folder['s_key']
-        data['auth'] = conf['server_password']
-        data['path'] = path
-        print(data)
-        url = conf['server_url'] + "/api/" + conf['api_version'] + '/get_file'
-        res = requests.get(url, params=data)
-        j = json.loads(res.text)
-        if str(j['succes']) != "True":
-                print "get file failed for [%s]/[%s]." % (folder['path'], path)
-        return j['data'][0]
-
-# def get_file(content):
-# 	conf = json.loads(content)	
-# 	version = conf['api_version']
-# 	server_list = {}
-# 	for folder in conf['folders']:
-# 		list_of_file = scan_directory(conf['folders'][folder]['path'], "")
-# 		for elem in list_of_file:
-# 			# print "============ %s =============" % (elem)
-# 			data = {}
-# 			data['s_key'] = conf['folders'][folder]['s_key']
-# 			data['auth'] = conf['server_password']
-# 			data['path'] = elem
-# 			# print data['path']
-# 			url = conf['server_url'] + "/api/" + version + '/get_file'
-# 			res = requests.get(url, params=data)
-# 			# print json.loads(res.text)['data'][0]['path']
-# 			# print json.loads(res.text)['data'][0]['size']
-# 			# print json.loads(res.text)['data'][0]['mtime']
-# 			server_list[str(folder) + ' ' + json.loads(res.text)['data'][0]['path']] = str(json.loads(res.text)['data'][0]['size']) + '@' + str(json.loads(res.text)['data'][0]['mtime'])
-# 	to_dl = diff_list(server_list, get_list(content))
-# 	print to_dl
-
+		data = {}
+		data['s_key'] = folder['s_key']
+		data['auth'] = conf['server_password']
+		data['path'] = path
+		# print(data)
+		url = conf['server_url'] + "/api/" + conf['api_version'] + '/get_file'
+		res = requests.get(url, params=data)
+		j = json.loads(res.text)
+		# print j
+		if str(j['succes']) != "True":
+				print "get file failed for [%s]/[%s]." % (folder['path'], path)
+		return j['data'][0]
 
 """
 diff between the server and slave list and master list
 """
 
 def diff_list(master, local):
-        res = []
-        for mf in master:
-                #print mf['path']
-                if (local.has_key(mf['path']) == False):
-                        print "%s not in local list." % (mf['path'])
-                        res.append(mf)
-                else:
-                        if (int(local[mf['path']]['size']) != int(mf['size'])):
-                                print "%s not the same size (m: %s l: %s)." % (mf['path'], mf['size'], local[mf['path']]['size'])
-                                res.append(mf)
-        return (res)
-
+		res = []
+		for mf in master:
+				#print mf['path']
+				if (local.has_key(mf['path']) == False):
+						print "%s not in local list." % (mf['path'])
+						res.append(mf)
+				else:
+						if (int(local[mf['path']]['size']) != int(mf['size'])):
+								print "%s not the same size (m: %s l: %s)." % (mf['path'], mf['size'], local[mf['path']]['size'])
+								res.append(mf)
+		return (res)
 
 """
 START POINT
@@ -238,18 +215,19 @@ START POINT
 if __name__ == "__main__":
 	with open(CONFIG_FILE, 'r') as f:
 		content = f.read()
-		#register_client(content)
-		#put_list(content)
-                #sys.exit 
-		# get_list(content)
-                
+		# register_client(content)
+		# put_list(content)
+		# sys.exit 
+				
 		conf = json.loads(content)
 		for folder in conf['folders']:
-                        master_list = get_list(conf, conf['folders'][folder])
-                        local_list = scan_directory(conf['folders'][folder]['path'], "")
-                        #print master_list
-                        #print local_list
-		        delta = diff_list(master_list, local_list)
-                        for d in delta:
-                                u = get_file(conf, conf['folders'][folder], d['path'])
-                                print "--> %s%s" % (u['baseurl'], u['path'])
+						master_list = get_list(conf, conf['folders'][folder])
+						local_list = scan_directory(conf['folders'][folder]['path'], "")
+						# print master_list
+						# print local_list
+						delta = diff_list(master_list, local_list)
+						for d in delta:
+							print d
+							u = get_file(conf, conf['folders'][folder], d['path'])
+							print "--> %s%s" % (u['baseurl'], u['path'])
+
