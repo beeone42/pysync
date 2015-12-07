@@ -31,7 +31,7 @@ def scan_directory(path, mask):
 		# print "dir changed"
 		list_of_file = {}
 		for f in glob.glob(mask):
-			print "f:[%s]" % (f)
+			# print "f:[%s]" % (f)
 			if os.path.isdir(f) == False:
 				statinfo = os.stat(f)
 				list_of_file[f] = str(statinfo.st_size) + "@" + str(time.strftime("%Y-%m-%dT%H:%M:%SZ", (time.gmtime(statinfo.st_mtime))))
@@ -166,7 +166,7 @@ def get_list(content):
 	conf = json.loads(content)	
 	version = conf['api_version']
 	da = register_client(content)
-	server_list = {}
+	slave_list = {}
 	for folder in conf['folders']:
 		# print folder
 		data = {}
@@ -174,34 +174,56 @@ def get_list(content):
 		data['auth'] = conf['server_password']
 		url = conf['server_url'] + "/api/" + version + '/get_list'
 		res = requests.get(url, params=data)
-		server_list[folder] = res.text
+		slave_list[folder] = res.text
 		if str(json.loads(res.text)['succes']) != "True":
 			print "get list failed for folder [%s]." % folder
 			break
-	return server_list
+	return slave_list
+
+"""
+GET dl_file
+"""
+def get_file(auth, folder, s_key, path):
+	pass
+
+
+# def get_file(content):
+# 	conf = json.loads(content)	
+# 	version = conf['api_version']
+# 	server_list = {}
+# 	for folder in conf['folders']:
+# 		list_of_file = scan_directory(conf['folders'][folder]['path'], "")
+# 		for elem in list_of_file:
+# 			# print "============ %s =============" % (elem)
+# 			data = {}
+# 			data['s_key'] = conf['folders'][folder]['s_key']
+# 			data['auth'] = conf['server_password']
+# 			data['path'] = elem
+# 			# print data['path']
+# 			url = conf['server_url'] + "/api/" + version + '/get_file'
+# 			res = requests.get(url, params=data)
+# 			# print json.loads(res.text)['data'][0]['path']
+# 			# print json.loads(res.text)['data'][0]['size']
+# 			# print json.loads(res.text)['data'][0]['mtime']
+# 			server_list[str(folder) + ' ' + json.loads(res.text)['data'][0]['path']] = str(json.loads(res.text)['data'][0]['size']) + '@' + str(json.loads(res.text)['data'][0]['mtime'])
+# 	to_dl = diff_list(server_list, get_list(content))
+# 	print to_dl
 
 
 """
-GET get_file
+diff between the server and slave list and master list
 """
 
-def get_file(content):
-	conf = json.loads(content)	
-	version = conf['api_version']
-	server_list = get_list(content)
-	for folder in conf['folders']:
-		list_of_file = scan_directory(conf['folders'][folder]['path'], "")
-		for elem in list_of_file:
-			# print "============ %s =============" % (elem)
-			data = {}
-			data['s_key'] = conf['folders'][folder]['s_key']
-			data['auth'] = conf['server_password']
-			data['path'] = elem
-			# print data['path']
-			url = conf['server_url'] + "/api/" + version + '/get_file'
-			res = requests.get(url, params=data)
-			url_file = json.loads(res.text)['data'][0]['path']
-			print data['path'].split('/')[-1]
+def diff_list(server, client):
+	print client
+
+		# name = elem.split(' ')[1]
+		# folder = elem.split(' ')[0]
+		# size = server[elem].split('@')[0]
+		# mtime = server[elem].split('@')[1]
+
+	return "debug"
+
 
 """
 START POINT
@@ -210,10 +232,12 @@ START POINT
 if __name__ == "__main__":
 	with open(CONFIG_FILE, 'r') as f:
 		content = f.read()
-		register_client(content)
-		put_list(content)
+		#register_client(content)
+		# put_list(content)
 		# get_list(content)
-		# get_file(content)
+		conf = json.loads(content)
+		for folder in conf['folders']:
+		diff_list(get_list(content, scan_directory))
 
 
 
