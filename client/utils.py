@@ -34,7 +34,7 @@ def scan_directory(path, mask):
 			# print "f:[%s]" % (f)
 			if os.path.isdir(f) == False:
 				statinfo = os.stat(f)
-				list_of_file[f] = str(statinfo.st_size) + "@" + str(time.strftime("%Y-%m-%dT%H:%M:%SZ", (time.gmtime(statinfo.st_mtime))))
+				list_of_file[f] = {"path": f, "size": str(statinfo.st_size), "mtime": str(time.strftime("%Y-%m-%dT%H:%M:%SZ", (time.gmtime(statinfo.st_mtime))))}
 		return list_of_file
 	except Exception as e:
 		print e
@@ -62,8 +62,8 @@ def generate_json(dic):
 		obj_json = {}
 		path = item
 		obj_json["path"] = path
-		obj_json["size"] = dic[item].split('@')[0]
-		obj_json["mtime"] = dic[item].split('@')[1]
+		obj_json["size"] = dic[item]["size"]
+		obj_json["mtime"] = dic[item]["mtime"]
 		obj_json["md5"] = str(md5(path))
 		list_array.append(obj_json)
 	return json.dumps(list_array)
@@ -162,23 +162,17 @@ def reset_list(content):
 GET get_list, get the file list of a slave s_key
 """
 
-def get_list(content):
-	conf = json.loads(content)	
-	version = conf['api_version']
-	da = register_client(content)
-	slave_list = {}
-	for folder in conf['folders']:
-		# print folder
-		data = {}
-		data['s_key'] = conf['folders'][folder]['s_key']
-		data['auth'] = conf['server_password']
-		url = conf['server_url'] + "/api/" + version + '/get_list'
-		res = requests.get(url, params=data)
-		slave_list[folder] = res.text
-		if str(json.loads(res.text)['succes']) != "True":
-			print "get list failed for folder [%s]." % folder
-			break
-	return slave_list
+def get_list(conf, folder):
+        print(folder)
+	data = {}
+	data['s_key'] = folder['s_key']
+	data['auth'] = conf['server_password']
+	url = conf['server_url'] + "/api/" + conf['api_version'] + '/get_list'
+	res = requests.get(url, params=data)
+	j = json.loads(res.text)
+	if str(j['succes']) != "True":
+		print "get list failed for folder [%s]." % folder
+	return j['data']
 
 """
 GET dl_file
@@ -214,15 +208,17 @@ def get_file(auth, folder, s_key, path):
 diff between the server and slave list and master list
 """
 
-def diff_list(server, client):
-	print client
-
-		# name = elem.split(' ')[1]
-		# folder = elem.split(' ')[0]
-		# size = server[elem].split('@')[0]
-		# mtime = server[elem].split('@')[1]
-
-	return "debug"
+def diff_list(master, local):
+        res = []
+        for mf in master:
+                #print mf['path']
+                if (local.has_key(mf['path']) == False):
+                        print "%s not in local list." % (mf['path'])
+                        res.append(mf)
+                else:
+                        if (int(local[mf['path']]['size']) != int(mf['size'])):
+                                print "%s not the same size (m: %s l: %s)." % (mf['path'], mf['size'], local[mf['path']]['size'])
+        return (res)
 
 
 """
@@ -233,11 +229,18 @@ if __name__ == "__main__":
 	with open(CONFIG_FILE, 'r') as f:
 		content = f.read()
 		#register_client(content)
-		# put_list(content)
+		#put_list(content)
+                #sys.exit 
 		# get_list(content)
+                
 		conf = json.loads(content)
 		for folder in conf['folders']:
-		diff_list(get_list(content, scan_directory))
+                        master_list = get_list(conf, conf['folders'][folder])
+                        local_list = scan_directory(conf['folders'][folder]['path'], "")
+                        #print master_list
+                        #print local_list
+		        delta = diff_list(master_list, local_list)
+                        print delta
 
 
 
