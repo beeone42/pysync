@@ -177,9 +177,18 @@ def get_list(conf, folder):
 """
 GET dl_file
 """
-def get_file(auth, folder, s_key, path):
-	pass
-
+def get_file(conf, folder, path):
+        data = {}
+        data['s_key'] = folder['s_key']
+        data['auth'] = conf['server_password']
+        data['path'] = path
+        print(data)
+        url = conf['server_url'] + "/api/" + conf['api_version'] + '/get_file'
+        res = requests.get(url, params=data)
+        j = json.loads(res.text)
+        if str(j['succes']) != "True":
+                print "get file failed for [%s]/[%s]." % (folder['path'], path)
+        return j['data'][0]
 
 # def get_file(content):
 # 	conf = json.loads(content)	
@@ -218,6 +227,7 @@ def diff_list(master, local):
                 else:
                         if (int(local[mf['path']]['size']) != int(mf['size'])):
                                 print "%s not the same size (m: %s l: %s)." % (mf['path'], mf['size'], local[mf['path']]['size'])
+                                res.append(mf)
         return (res)
 
 
@@ -240,35 +250,6 @@ if __name__ == "__main__":
                         #print master_list
                         #print local_list
 		        delta = diff_list(master_list, local_list)
-                        print delta
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                        for d in delta:
+                                u = get_file(conf, conf['folders'][folder], d['path'])
+                                print "--> %s%s" % (u['baseurl'], u['path'])
