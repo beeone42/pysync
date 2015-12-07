@@ -25,7 +25,7 @@ If not mask is not mentionned, * is default
 def scan_directory(path, mask):
 	if mask == "":
 		mask = "*"
-	print "Sanning [%s] on [%s]." % (mask, path)
+	print "Scanning [%s] on [%s]." % (mask, path)
 	try:
 		os.chdir(path)
 		print "dir changed"
