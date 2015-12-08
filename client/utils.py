@@ -25,7 +25,7 @@ If not mask is not mentionned, * is default
 def scan_directory(path, mask):
 	if mask == "":
 		mask = "*"
-	# print "Sanning [%s] on [%s]." % (mask, path)
+	print "Scanning [%s] on [%s]." % (mask, path)
 	try:
 		os.chdir(path)
 		# print "dir changed"
@@ -88,74 +88,52 @@ def diff(list_m, list_s):
 GET request to register client
 """
 
-def register_client(content):
-	conf = json.loads(content)
-	version = conf['api_version']
-	result = {}
-	for folder in conf['folders']:
-		data = {}
-		data['s_key'] = conf['folders'][folder]['s_key']
-		data['m_key'] = conf['folders'][folder]['m_key']
-		data['auth'] = conf['server_password']
-		data['baseurl'] = conf['folders'][folder]['baseurl']
-		url = conf['server_url'] + "/api/" + version + '/register_client'
-		res = requests.get(url, params=data)
-		if str(json.loads(res.text)['succes']) != "True":
-			print "register client failed for folder [%s]." % folder
-			break
-		result[folder] = json.loads(res.text)['data']['client_id']
-		print res.text
-	print result
-	return result
+def register_client(conf, folder):
+	data = {}
+	data['s_key'] = conf['folders'][folder]['s_key']
+	data['m_key'] = conf['folders'][folder]['m_key']
+	data['auth'] = conf['server_password']
+	data['baseurl'] = conf['folders'][folder]['baseurl']
+	url = conf['server_url'] + "/api/" + conf['api_version'] + '/register_client'
+	res = requests.get(url, params=data)
+	if str(json.loads(res.text)['succes']) != "True":
+		print "register client failed for folder [%s]." % folder
+	return (json.loads(res.text)['data']['client_id'])
 
 """
 POST request to put list,  TODO avant faire un reset si diff ok ou pas
 """
 
-def put_list(content):
-
-	#  VOIR TODO ABOVE
-
-	reset_list(content)
-
-	conf = json.loads(content)
-	version = conf['api_version']
-	da = register_client(content)
-	for folder in conf['folders']:
-		data = {}
-		data['s_key'] = conf['folders'][folder]['s_key']
-		data['auth'] = conf['server_password']
-		data['client_id'] = da[folder]
-		data['data'] = generate_json(scan_directory(conf['folders'][folder]['path'], ""))
-		url = conf['server_url'] + "/api/" + version + '/put_list'
-		res = requests.post(url, data=data)
-		result = json.loads(res.text)
-		print result
-		if str(result['succes']) != "True":
-			print "put list failed for folder [%s]." % folder
-			break
-		print res.url
-		print res.text
-
+def put_list(conf, folder, files):
+        print "put_list "
+        print files
+	data = {}
+	data['s_key'] = conf['folders'][folder]['s_key']
+	data['auth'] = conf['server_password']
+	data['client_id'] = conf['folders'][folder]['client_id']
+	data['data'] = generate_json(files)
+	url = conf['server_url'] + "/api/" + conf['api_version'] + '/put_list'
+	res = requests.post(url, data=data)
+	result = json.loads(res.text)
+	print result
+	if str(result['succes']) != "True":
+		print "put list failed for folder [%s]." % folder
+	print res.url
+	print res.text
 
 """
 GET reset a file list_array
 """
 
-def reset_list(content):
-	conf = json.loads(content)
-	version = conf['api_version']
-	da = register_client(content)
-	for folder in conf['folders']:
-		data = {}
-		data['s_key'] = conf['folders'][folder]['s_key']
-		data['auth'] = conf['server_password']
-		data['client_id'] = da[folder]
-		url = conf['server_url'] + "/api/" + version + '/reset_list'
-		res = requests.get(url, params=data)
-		if str(json.loads(res.text)['succes']) != "True":
-			print "reset list failed for folder [%s]." % folder
-			break
+def reset_list(conf, folder):
+	data = {}
+	data['s_key'] = conf['folders'][folder]['s_key']
+	data['auth'] = conf['server_password']
+	data['client_id'] = conf['folders'][folder]['client_id']
+	url = conf['server_url'] + "/api/" + conf['api_version'] + '/reset_list'
+	res = requests.get(url, params=data)
+	if str(json.loads(res.text)['succes']) != "True":
+		print "reset list failed for folder [%s]." % folder
 
 
 """
@@ -208,26 +186,38 @@ def diff_list(master, local):
 								res.append(mf)
 		return (res)
 
-"""
+def dl_list(conf, folder, files):
+	for f in files:
+		print f
+		u = get_file(conf, conf['folders'][folder], f['path'])
+		print "--> %s%s" % (u['baseurl'], u['path'])
+                wget.download(u['baseurl'] + u['path'], out=(conf['folders'][folder]['path'] + u['path']))
+                md5sum = md5(conf['folders'][folder]['path'] + u['path'])
+                if (md5sum == f['md5']):
+                        print "md5 ok !"
+                        put_list(conf, folder, {u['path']:u})
+
+
+        """
 START POINT
 """
 
 if __name__ == "__main__":
 	with open(CONFIG_FILE, 'r') as f:
 		content = f.read()
-		# register_client(content)
-		# put_list(content)
+		#client_id = register_client(content)
+		#put_list(content)
 		# sys.exit 
 				
 		conf = json.loads(content)
 		for folder in conf['folders']:
-						master_list = get_list(conf, conf['folders'][folder])
-						local_list = scan_directory(conf['folders'][folder]['path'], "")
-						# print master_list
-						# print local_list
-						delta = diff_list(master_list, local_list)
-						for d in delta:
-							print d
-							u = get_file(conf, conf['folders'][folder], d['path'])
-							print "--> %s%s" % (u['baseurl'], u['path'])
-
+                        local_list = scan_directory(conf['folders'][folder]['path'], "")
+                        if (conf['folders'][folder].has_key('client_id')== False):
+                                conf['folders'][folder]['client_id'] = register_client(conf, folder)
+                        if (conf['folders'][folder]['m_key'] != ""): # master
+                                reset_list(conf, folder)
+                                put_list(conf, folder, local_list)
+                        else:
+			        master_list = get_list(conf, conf['folders'][folder])
+			        delta = diff_list(master_list, local_list)
+                                dl_list(conf, folder, delta)

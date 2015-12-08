@@ -13,7 +13,7 @@
 	"url" : "https://github.com/beeone42/pysync.git"
     },
     "dependencies": {
-	"nconf": "lastest",
-	"mysql": "lastest"
+	"nconf": "^0.8.2",
+	"mysql": "^2.9.0"
     }
 }
