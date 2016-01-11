@@ -78,13 +78,6 @@ def ilog(log_msg):
 
 
 """
-diff the server list and slave list and output what need to be uploaded
-"""
-
-def diff(list_m, list_s):
-	pass
-
-"""
 GET request to register client
 """
 
