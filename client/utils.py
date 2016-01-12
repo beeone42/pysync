@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-import os, json, sys, glob, hashlib, time, datetime, json, requests, wget
-
+import os, json, sys, glob, hashlib, time, datetime, json, requests, urllib2
 
 CONFIG_FILE = 'config.json'
 
@@ -145,6 +144,7 @@ def get_list(conf, folder):
 		print "get list failed for folder [%s]." % folder
 	return j['data']
 
+
 """
 GET dl_file
 """
@@ -160,7 +160,7 @@ def get_file(conf, folder, path):
 		# print j
 		if str(j['succes']) != "True":
 				print "get file failed for [%s]/[%s]." % (folder['path'], path)
-		return j['data'][0]
+		return j['data']
 
 """
 diff between the server and slave list and master list
@@ -179,16 +179,39 @@ def diff_list(master, local):
 								res.append(mf)
 		return (res)
 
+
+def dl_file(url, file_name):
+        # Download the file from `url` and save it locally under `file_name`:
+        print "dl_file: " + url + " to " + file_name
+        try:
+                response = urllib2.urlopen(url, None, 2)
+                out_file = open(file_name, 'wb')
+                while True:
+                        data = response.read(4096)
+                        if data:
+                                out_file.write(data)
+                        else:
+                                break
+                out_file.close()
+        except Exception, e:
+                print "Erreur : %s" % e
+                return False
+        return True
+
 def dl_list(conf, folder, files):
 	for f in files:
 		print f
-		u = get_file(conf, conf['folders'][folder], f['path'])
-		print "--> %s%s" % (u['baseurl'], u['path'])
-                wget.download(u['baseurl'] + u['path'], out=(conf['folders'][folder]['path'] + u['path']))
-                md5sum = md5(conf['folders'][folder]['path'] + u['path'])
-                if (md5sum == f['md5']):
-                        print "md5 ok !"
-                        put_list(conf, folder, {u['path']:u})
+		us = get_file(conf, conf['folders'][folder], f['path'])
+                for u in us:
+		        print "--> %s%s" % (u['baseurl'], u['path'])
+                        if (dl_file(u['baseurl'] + u['path'], conf['folders'][folder]['path'] + u['path'])):
+                                md5sum = md5(conf['folders'][folder]['path'] + u['path'])
+                                if (md5sum == f['md5']):
+                                        print "md5 ok !"
+                                        put_list(conf, folder, {u['path']:u})
+                                        break
+                                else:
+                                        os.unlink(conf['folders'][folder]['path'] + u['path'])
 
 
         """
