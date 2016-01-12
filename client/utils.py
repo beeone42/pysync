@@ -16,6 +16,17 @@ def open_and_load_config():
 		print "File [%s] doesn't exist, aborting." % (CONFIG_FILE)
 		sys.exit(1)
 
+
+def merge_dicts(*dict_args):
+        '''
+        Given any number of dicts, shallow copy and merge into a new dict,
+        precedence goes to key value pairs in latter dicts.
+        '''
+        result = {}
+        for dictionary in dict_args:
+                result.update(dictionary)
+        return result
+
 """
 Scan a directory and get all file's name / size and mtime
 If not mask is not mentionned, * is default
@@ -34,6 +45,10 @@ def scan_directory(path, mask):
 			if os.path.isdir(f) == False:
 				statinfo = os.stat(f)
 				list_of_file[f] = {"path": f, "size": str(statinfo.st_size), "mtime": str(time.strftime("%Y-%m-%dT%H:%M:%SZ", (time.gmtime(statinfo.st_mtime))))}
+                        else:
+                                tmp = scan_directory(path, f + "/*")
+                                list_of_file.update(tmp);
+                                        
 		return list_of_file
 	except Exception as e:
 		print e
@@ -201,6 +216,9 @@ def dl_file(url, file_name):
 def dl_list(conf, folder, files):
 	for f in files:
 		print f
+                d = os.path.dirname(conf['folders'][folder]['path'] + f['path'])
+                if (os.path.isdir(d) is not True):
+                        os.makedirs(d)
 		us = get_file(conf, conf['folders'][folder], f['path'])
                 for u in us:
 		        print "--> %s%s" % (u['baseurl'], u['path'])
