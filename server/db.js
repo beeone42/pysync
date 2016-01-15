@@ -28,7 +28,8 @@ function get_file(conf, response, s_key, path) {
 	" LEFT JOIN `clients` on `clients`.id = `files`.client_id " +
 	" WHERE `keys`.s_key = " + conf.connection.escape(s_key) +
 	"   AND `files`.path = " + conf.connection.escape(path) +
-	" ORDER BY ptime DESC";
+	" ORDER BY ptime DESC " +
+	" LIMIT 0, 10";
     console.log(q);
     conf.connection.query(q, function(err, rows, fields) {
 	if (!err)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, json, sys, glob, hashlib, time, datetime, json, requests, urllib2
+import os, json, sys, glob, hashlib, time, datetime, json, requests, urllib2, random
 
 CONFIG_FILE = 'config.json'
 
@@ -175,6 +175,7 @@ def get_file(conf, folder, path):
 		# print j
 		if str(j['succes']) != "True":
 				print "get file failed for [%s]/[%s]." % (folder['path'], path)
+                random.shuffle(j['data'])
 		return j['data']
 
 """
