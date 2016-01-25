@@ -47,6 +47,22 @@ function get_file(conf, response, s_key, path) {
 
 }
 
+function log(conf, msg) {
+    var q = "INSERT INTO logs (t, msg) VALUES (NOW(), " + conf.connection.escape(msg) + ")"; 
+    console.log(q);
+    conf.connection.query(q, function(err, rows, fields) {
+	if (!err)
+	{
+	    console.log('Ok');
+	}
+	else
+	{
+	    console.log('Error while performing Query.');
+	    console.log(err);
+	}
+    });
+}
+
 function date_mysql(d)
 {
     return (d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + " " + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds());
