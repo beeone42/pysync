@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, json, sys, glob, hashlib, time, datetime, json, requests, urllib2, random
+import os, json, sys, glob, hashlib, time, datetime, json, requests, urllib, urllib2, random
 
 CONFIG_FILE = 'config.json'
 
@@ -222,8 +222,8 @@ def dl_list(conf, folder, files):
                         os.makedirs(d)
 		us = get_file(conf, conf['folders'][folder], f['path'])
                 for u in us:
-		        print "--> %s%s" % (u['baseurl'], urllib2.urlencode(u['path']))
-                        if (dl_file(u['baseurl'] + u['path'], conf['folders'][folder]['path'] + u['path'])):
+		        print "--> %s%s" % (u['baseurl'], urllib.quote(u['path']))
+                        if (dl_file(u['baseurl'] + urllib.quote(u['path']), conf['folders'][folder]['path'] + u['path'])):
                                 md5sum = md5(conf['folders'][folder]['path'] + u['path'])
                                 if (md5sum == f['md5']):
                                         print "md5 ok !"
