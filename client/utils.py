@@ -222,7 +222,7 @@ def dl_list(conf, folder, files):
                         os.makedirs(d)
 		us = get_file(conf, conf['folders'][folder], f['path'])
                 for u in us:
-		        print "--> %s%s" % (u['baseurl'], u['path'])
+		        print "--> %s%s" % (u['baseurl'], urllib2.urlencode(u['path']))
                         if (dl_file(u['baseurl'] + u['path'], conf['folders'][folder]['path'] + u['path'])):
                                 md5sum = md5(conf['folders'][folder]['path'] + u['path'])
                                 if (md5sum == f['md5']):
