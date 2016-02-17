@@ -57,6 +57,8 @@ function start(conf, route, handle) {
 	var postData = "";
 	var pathname = url.parse(request.url).pathname;
 	console.log("Request from " + request.connection.remoteAddress + " for path " + pathname + ".");
+	response.remoteAddress = request.connection.remoteAddress;
+	
 	response.json = json;
 	response.fail = fail;
 	response.text = text;

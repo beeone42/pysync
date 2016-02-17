@@ -79,7 +79,11 @@ function register_client(conf, response, qs, pd) {
     if (qs.baseurl == undefined)
 	response.fail("baseurl field is missing in GET");
     else
-    conf.db.register_client(conf, response, qs.m_key, qs.s_key, qs.baseurl);
+    {
+	console.log("REMOTE_IP: " + response.remoteAddress);
+	conf.db.register_client(conf, response, qs.m_key, qs.s_key,
+				qs.baseurl.replace('[IP]', response.remoteAddress.replace('::ffff:', '')));
+    }
 }
 
 exports.hello = hello;
