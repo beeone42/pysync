@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * Database config variables
+ */
+define("DB_HOST", "localhost");
+define("DB_USER", "pysync");
+define("DB_PASSWORD", "ChangeMe");
+define("DB_DATABASE", "pysync");
+
+$config['project_name'] = "PySync";
+$config['default_view'] = "dashboard";
+
+$config['auth_user'] = "admin";
+$config['auth_pass'] = hash('whirlpool', "ChangeMe");
+
+$config['views'] = Array(
+		      "login"		=> "",
+      		      "dashboard"	=> "Dashboard",
+   		      "logout"		=> "Logout"
+		);
+
+$config['icons'] = Array(
+		      "dashboard"	=> "fa-dashboard",
+		      "logout"		=> "fa-sign-out"
+		);
+
+?>
