@@ -257,3 +257,4 @@ if __name__ == "__main__":
 			        master_list = get_list(conf, conf['folders'][folder])
 			        delta = diff_list(master_list, local_list)
                                 dl_list(conf, folder, delta)
+                                put_list(conf, folder, local_list)

@@ -230,7 +230,7 @@ function register_client(conf, response, m_key, s_key, ip, name, baseurl)
 	    {
 		console.log("key found");
 		console.log(rows);
-		do_register_client(conf, response, rows[0].id, baseurl, 0); // if not the first to register key, not the master
+		do_register_client(conf, response, rows[0].id, ip, name, baseurl, 0); // if not the first to register key, not the master
 	    }
 	}
 	else
