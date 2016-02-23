@@ -192,7 +192,7 @@ function do_register_client(conf, response, key_id, ip, name, baseurl, is_master
     });
 }
 
-function register_client(conf, response, m_key, s_key, baseurl)
+function register_client(conf, response, m_key, s_key, ip, name, baseurl)
 {
 
     var q = "SELECT `keys`.id FROM `keys` WHERE s_key = " + conf.connection.escape(s_key);
@@ -211,7 +211,7 @@ function register_client(conf, response, m_key, s_key, baseurl)
 			if (!err)
 			{
 			    console.log(res.insertId);
-			    do_register_client(conf, response, res.insertId, baseurl, 1);
+			    do_register_client(conf, response, res.insertId, ip, name, baseurl, 1);
 			}
 			else
 			{

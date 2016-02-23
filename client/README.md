@@ -9,3 +9,8 @@ You need requests python package to run the client
     pip install requests
     python ./utils.py
 
+your client need to serve the file you want to sync with a file webserver
+
+to test your file webserver you can simply use this kind of command (insecure! do not use in production)
+
+    python -m SimpleHTTPServer 8080
