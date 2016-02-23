@@ -1,16 +1,20 @@
 {
-	"server_url":"http:\/\/pysync.domain.com\/tracker.py",
-	"server_password":"6b97eb534389f8721de8529992dc3fee",
+	"api_version":"v1",
+	"server_url":"http://pysync.domain.com:8000",
+	"server_password":"YouNeedToChangeMe",
+	"client_name":"imac-sb",
 	"folders":{
 		"CDN":{
-			"path":"\/space\/cdn\/",
+			"path":"/space/cdn/",
 			"m_key":"",
-			"s_key":"qwerty9876543210"
+			"s_key":"qwerty9876543210",
+			"baseurl":"http://192.168.0.42:8080/CDN/"
 		},
 		"pictures":{
-			"path":"\/home\/John\/Pictures\/",
+			"path":"/home/John/Pictures/",
 			"master_secret":"eb0a191797624dd3a48fa681d3061212",
-			"slave_secret":"03158cf39c6f316f9ce98a4e034cdc28"
+			"slave_secret":"03158cf39c6f316f9ce98a4e034cdc28",
+			"baseurl":"http://192.168.0.42:8080/pictures/"
 		}
 	}
 }
