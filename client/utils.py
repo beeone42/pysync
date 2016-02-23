@@ -100,6 +100,7 @@ def register_client(conf, folder):
 	data['s_key'] = conf['folders'][folder]['s_key']
 	data['m_key'] = conf['folders'][folder]['m_key']
 	data['auth'] = conf['server_password']
+	data['name'] = conf['client_name']
 	data['baseurl'] = conf['folders'][folder]['baseurl']
 	url = conf['server_url'] + "/api/" + conf['api_version'] + '/register_client'
 	res = requests.get(url, params=data)

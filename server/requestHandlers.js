@@ -81,7 +81,7 @@ function register_client(conf, response, qs, pd) {
     else
     {
 	console.log("REMOTE_IP: " + response.remoteAddress);
-	conf.db.register_client(conf, response, qs.m_key, qs.s_key,
+	conf.db.register_client(conf, response, qs.m_key, qs.s_key, response.remoteAddress, qs.name,
 				qs.baseurl.replace('[IP]', response.remoteAddress.replace('::ffff:', '')));
     }
 }

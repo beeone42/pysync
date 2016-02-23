@@ -147,7 +147,7 @@ function reset_list(conf, response, client_id, s_key) {
 }
 
 
-function do_register_client(conf, response, key_id, baseurl, is_master)
+function do_register_client(conf, response, key_id, ip, name, baseurl, is_master)
 {
     var q = "SELECT clients.id FROM clients " +
 	" WHERE `clients`.baseurl = " + conf.connection.escape(baseurl) + " " +
@@ -161,8 +161,10 @@ function do_register_client(conf, response, key_id, baseurl, is_master)
 		response.json({"client_id":rows[0].id});
 	    else // new client
 	    {
-		var q2 = "INSERT INTO clients (key_id, baseurl, is_master) VALUES (" +
+		var q2 = "INSERT INTO clients (key_id, ip, name, baseurl, is_master) VALUES (" +
 		    conf.connection.escape(key_id) + ", " +
+		    conf.connection.escape(ip) + ", " +
+		    conf.connection.escape(name) + ", " +
 		    conf.connection.escape(baseurl) + ", " +
 		    conf.connection.escape(is_master) +
 		    ")";
